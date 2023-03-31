@@ -23,15 +23,13 @@ knitr::opts_chunk$set(collapse  = TRUE,
 <!-- badges: end -->
 
 
-Research Compendium of the project **{{ PLEASE ADD A FEW WORDS }}**
+Research Compendium to demonstrate how to run an analysis in the cloud.
 
 
 
-### How to cite
+### Steps to create
 
-Please cite this compendium as: 
-
-> **{{ PLEASE ADD A CITATION }}**
+This compendium was setup by creating a new GitHub repo on GitHub, cloning it by starting a new project from version control in RStudio, and running `rcompendium::new_compendium(create_repo = FALSE, renv = TRUE)`
 
 
 

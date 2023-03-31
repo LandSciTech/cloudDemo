@@ -1,6 +1,6 @@
 Package: cloudDemo
 Type: Package
-Title: The Title of the Project
+Title: Demo Cloud Project
 Version: 0.0.0.9000
 Authors@R: c(
     person(given   = "Sarah",
@@ -8,8 +8,7 @@ Authors@R: c(
            role    = c("aut", "cre", "cph"),
            email   = "sarah.endicott@canada.ca",
            comment = c(ORCID = "0000-0001-9644-5343")))
-Description: A paragraph providing a full description of the project (on 
-    several lines...)
+Description: A repo for demonstrating how to use the cloud for a typical analysis in R
 URL: https://github.com/see24/cloudDemo
 BugReports: https://github.com/see24/cloudDemo/issues
 License: GPL (>= 2)
@@ -20,3 +19,7 @@ Imports:
     devtools,
     here,
     renv
+VignetteBuilder: knitr
+Suggests: 
+    knitr,
+    rmarkdown

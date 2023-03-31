@@ -4,9 +4,9 @@
 \name{cloudDemo-package}
 \alias{cloudDemo}
 \alias{cloudDemo-package}
-\title{cloudDemo: The Title of the Project}
+\title{cloudDemo: Demo Cloud Project}
 \description{
-A paragraph providing a full description of the project (on several lines...)
+A repo for demonstrating how to use the cloud for a typical analysis in R
 }
 \seealso{
 Useful links:

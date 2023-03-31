@@ -16,8 +16,12 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
+    broom,
     devtools,
+    dplyr,
+    ggplot2,
     here,
+    purrr,
     renv
 VignetteBuilder: knitr
 Suggests: 

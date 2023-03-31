@@ -6,16 +6,17 @@
 
 [![License: GPL (&gt;=
 2)](https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg)](https://choosealicense.com/licenses/gpl-2.0/)
-[![Dependencies](https://img.shields.io/badge/dependencies-3/94-green?style=flat)](#)
+[![Dependencies](https://img.shields.io/badge/dependencies-7/106-orange?style=flat)](#)
 <!-- badges: end -->
 
-Research Compendium of the project **{{ PLEASE ADD A FEW WORDS }}**
+Research Compendium to demonstrate how to run an analysis in the cloud.
 
-### How to cite
+### Steps to create
 
-Please cite this compendium as:
-
-> **{{ PLEASE ADD A CITATION }}**
+This compendium was setup by creating a new GitHub repo on GitHub,
+cloning it by starting a new project from version control in RStudio,
+and running
+`rcompendium::new_compendium(create_repo = FALSE, renv = TRUE)`
 
 ### Content
 

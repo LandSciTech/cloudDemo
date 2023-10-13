@@ -1,0 +1,64 @@
+---
+title: "Setting up cloud processing with Azure Batch"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Setting up cloud processing with Azure Batch}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Background
+
+Azure Batch is one of many Azure services that can be used to run analyses in the cloud. It uses a hierarchy of **Pools** which contain **Jobs** which contain **Tasks**. A **Pool** is a group of **Nodes** (similar to virtual machines) which are the computers that will run the analyses. When a pool is created you choose the number of nodes and configure the operating system, RAM and number of cores that each node will have. **Jobs** are used for scheduling different related tasks in most cases they are just a folder that contains your tasks. **Tasks** contain the code that you want the node to run and information on where to get data from and save it to. 
+
+There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. 
+
+## Install Azure CLI and AzCopy
+
+### Azure CLI
+1) Install using install wizard https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli#install-or-update
+
+### AzCopy
+1)	Download azcopy https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
+2)	Unzip into an easy to access directory ie C:\ or C:\Users\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).
+
+
+## Use Azure CLI to run an analysis
+
+### Signing in
+1) Run `az login` in the command prompt. This will open a web browser for you to login
+2) Run `az batch account login -g EcDc-WLS-rg -n ecdcwlsbatch` to connect to the "EcDc-WLS-rg" resource group and "ecdcwlsbatch" service name.
+3) Run `az batch pool list` to show any existing pools
+*Note: if you get an error at this point saying "This request is not authorized to perform this operation." you are likely not signed on to the VPN, sign on and try again.*  
+
+### Creating a pool
+You can create a pool from the CLI either by providing the configuration as individual arguments or by supplying a JSON file. I use the JSON file option because then it is easy to modify previous versions and not all functionality is available as an argument. 
+
+
+
+
+Moving files to/from container from command line
+
+3)	Get the Shared Access Token URL for the container you want to access (See Step 2) above)
+4)	Run your command in the Windows cmd shell you will need the path to the azcopy executable unless you added it to your PATH
+The syntax for the copy command is:
+azcopy copy [source] [destination] [flags]
+where source and destination should be either the local file path or container SAS URL 
+To download all the files in the directory s4:
+.\azcopy\azcopy.exe copy "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>" "C:\Users\endicotts\Documents\gitprojects\Caribou-Demographic-Projection-Paper"  --recursive
+
+To delete all the files in the directory now that they are downloaded:
+-	Use --dry-run to list the files
+.\azcopy\azcopy.exe rm --recursive=true --dry-run "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>"
+
+-	Then actually delete them
+.\azcopy\azcopy.exe rm --recursive=true "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>"
+See more detailed documentation of commands and their arguments here
+

@@ -1,0 +1,14 @@
+{
+    "id": "sampleTask",
+    "commandLine": "bash -c 'echo hello'",
+	"containerSettings": {
+    "imageName": "rocker/r-bspm:jammy",
+    "containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "nonadmin"
+        }
+    }
+}

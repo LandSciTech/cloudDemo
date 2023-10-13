@@ -22,7 +22,7 @@ I then started writing my first script in "analyses/01_run_model.R". As I use pa
 Once the script is ready I add a line to the "make.R" file that will source my script. I also set a global ggplot2 theme in the make file so it will be used in all scripts. To check everything is up-to-date and to run the "make.R" file I first restart R and then run `rcompendium::refresh(".", make = TRUE)`. This will ensure that your script works from a fresh R session. 
 
 ## Running the analysis in parallel
-So far our analysis is run sequentially so it will not be able to take advantage of the multiple cores available on a cloud machine. To make use of parallel computing we can set up our script to run each model on a separate core. Because this example is so simple I have added a delay in the function so we can see the benefit of running in parallel. There are many ways to do this and I will explain a few options. One option is to create a parallel backend in R using something like the future package. This can be quite straight forward and there are packages to connect this familiar methods of iterating (eg for loops, lapply or purrr). This can get a bit tricky in that you are typically running only parts of the script on multiple cores you need to make sure the right dependencies are available on the workers. future manages this for the most part but see https://future.futureverse.org/articles/future-4-issues.html for tips when that fails.  
+So far our analysis is run sequentially so it will not be able to take advantage of the multiple cores available on a cloud machine. To make use of parallel computing we can set up our script to run each model on a separate core. Because this example is so simple I have added a delay in the function so we can see the benefit of running in parallel. There are many ways to do this and I will explain a few options. One option is to create a parallel backend in R using something like the future package. This can be quite straight forward and there are packages to connect this with familiar methods of iterating (eg for loops, lapply or purrr). This can get a bit tricky in that you are typically running only parts of the script on multiple cores you need to make sure the right dependencies are available on the workers. future manages this for the most part but see https://future.futureverse.org/articles/future-4-issues.html for tips when that fails.  
 
 ### Using the future and furrr packages
 
@@ -30,6 +30,6 @@ The future package sets up the infrastructure needed to run things in the backgr
 
 ### Using future and foreach
 
-If you usually use for loops then the foreach package might be easier to use. This can be used with future to create the backend using the doFuture package. 
+If you usually use for loops then the foreach package might be easier to use. This can be used with future to create the backend using the doFuture package. See script "analyses/02_run_model_foreach.R" for an example.
 
 

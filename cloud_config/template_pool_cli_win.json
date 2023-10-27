@@ -1,0 +1,29 @@
+{
+	"type": "Microsoft.Batch/batchAccounts/pools",
+	"apiVersion": "2016-12-01",
+	"id": "test_pool_json_cli_win",
+	"vmSize": "standard_A1_v2",
+	"virtualMachineConfiguration": {
+	  "imageReference": {
+      "offer": "dsvm-win-2019",
+      "publisher": "microsoft-dsvm",
+      "sku": "winserver-2019",
+      "version": "latest"
+    },
+    "nodeAgentSkuId": "batch.node.windows amd64",
+		"containerConfiguration": {
+		  "type": "dockerCompatible",
+		  "containerImageNames": [
+			"mcr.microsoft.com/windows:ltsc2019"
+		  ]
+		},
+		"nodePlacementConfiguration": {
+		  "policy": "regional"
+		}
+	},
+		"targetDedicatedNodes": 1,
+	"networkConfiguration": {
+		"subnetId":"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"
+		}
+}
+

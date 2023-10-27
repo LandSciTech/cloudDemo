@@ -1,6 +1,6 @@
 {
     "id": "sampleTask",
-    "commandLine": "bash -c 'echo hello'",
+    "commandLine": "R -e 'mean(mtcars$mpg)'",
 	"containerSettings": {
     "imageName": "rocker/r-bspm:jammy",
     "containerRunOptions": "--rm"

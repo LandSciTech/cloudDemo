@@ -1,0 +1,33 @@
+{
+    "id": "test_outFile",
+    "commandLine": "bash -c 'sh run_script.sh'",
+	"outputFiles": [{
+		"destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott?sp=racwdl&st=2023-02-16T14:35:41Z&se=2023-02-16T22:35:41Z&spr=https&sv=2021-06-08&sr=c&sig=JuTyPMF6cGWA8clYFZOkMGUZxfe%2BnTkWwSObe0jZ1z8%3D"
+			}
+		},
+		"filePattern": "*.csv",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	}
+	],
+	"resourceFiles": [{
+		"autoStorageContainerName": "sendicott"
+	}
+	
+	],
+
+
+	"containerSettings": {
+    "imageName": "rocker/r-ubuntu:jammy",
+    "containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "admin"
+        }
+    }
+}

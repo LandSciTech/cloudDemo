@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Background
 
-Azure Batch is one of many Azure services that can be used to run analyses in the cloud. It uses a hierarchy of **Pools** which contain **Jobs** which contain **Tasks**. A **Pool** is a group of **Nodes** (similar to virtual machines) which are the computers that will run the analyses. When a pool is created you choose the number of nodes and configure the operating system, RAM and number of cores that each node will have. **Jobs** are used for scheduling different related tasks in most cases they are just a folder that contains your tasks. **Tasks** contain the code that you want the node to run and information on where to get data from and save it to. 
+Azure Batch is one of many Azure services that can be used to run analyses in the cloud. It uses a hierarchy of **Pools** which contain **Jobs** which contain **Tasks**. A **Pool** is a group of **Nodes** (similar to virtual machines) which are the computers that will run the analyses. When a pool is created you choose the number of nodes and configure the operating system, RAM and number of cores that each node will have. **Jobs** are used for scheduling different related tasks, in simple cases they are just a folder that contains your tasks. **Tasks** contain the code that you want the node to run and information on where to get data from and save it to. 
 
 There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. 
 
@@ -32,21 +32,133 @@ There are several options available for interacting with Azure Batch including t
 
 ## Use Azure CLI to run an analysis
 
-### Signing in
-1) Run `az login` in the command prompt. This will open a web browser for you to login
+### Sign in
+1) Run `az login` in the command prompt. This will open a web browser for you to login.
 2) Run `az batch account login -g EcDc-WLS-rg -n ecdcwlsbatch` to connect to the "EcDc-WLS-rg" resource group and "ecdcwlsbatch" service name.
-3) Run `az batch pool list` to show any existing pools
+3) Run `az batch pool list` to show any existing pools.
 *Note: if you get an error at this point saying "This request is not authorized to perform this operation." you are likely not signed on to the VPN, sign on and try again.*  
 
-### Creating a pool
+### Create a pool
 You can create a pool from the CLI either by providing the configuration as individual arguments or by supplying a JSON file. I use the JSON file option because then it is easy to modify previous versions and not all functionality is available as an argument. 
 
+A template JSON file is provided in this repository under cloud_config/template_pool_cli.json. Some parts of the JSON file should stay the same in most cases while others will need to be adjusted based on the type of pool you want to build.
 
+```JSON
+{
+	"type": "Microsoft.Batch/batchAccounts/pools",
+	"apiVersion": "2016-12-01",
+	"id": "test_pool_json_cli",
+	"vmSize": "standard_A1_v2",
+	"virtualMachineConfiguration": {
+		"imageReference": {
+			"publisher": "microsoft-azure-batch",
+			"offer": "ubuntu-server-container",
+			"sku": "20-04-lts",
+			"version": "latest"
+		},
+		"nodeAgentSKUId": "batch.node.ubuntu 20.04",
+		"containerConfiguration": {
+		  "type": "dockerCompatible",
+		  "containerImageNames": [
+			"rocker/r-bspm:jammy"
+		  ]
+		},
+		"nodePlacementConfiguration": {
+		  "policy": "regional"
+		}
+	},
+		"targetDedicatedNodes": 1,
+	"networkConfiguration": {
+		"subnetId":"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"
+		}
+}
 
+```
+
+#### Fields to edit:
+
+- id: Give the pool a name. It should start with the first letter of your first name and your last name so we can differentiate them to track billing eg "sendicott_test_pool"
+- vmSize: This is the family of VM and the number of CPUs different families will have different # CPU to RAM ratios. We have access to a subset of VM families with a [quota](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountQuotas) for each one. See this [Microsoft website](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes) for some details on the different families. The easiest way to filter the options and choose a size is to go to the Azure portal > Batch > [Pools page](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountPools) and click "Add" and then scroll to  vmSize and follow the link for "View full pricing details". In this example we use "Standard_A1_v2". All the names start with "Standard_" and then you substitute the sku which contains the Family, # CPUs and version. 
+- targetDedicatedNodes: The number of nodes to have in the pool. Typically 1 if you are going to run one task that might use multiple cores on one machine for parallelization or one for each task you want to run on a separate machine. 
+- containerImageNames: The name of the docker image that you want to use. This will pre-fetch this docker image for use with your tasks. You can enter the name of any [DockerHub](https://hub.docker.com/) image. For R users see the [rocker project](https://rocker-project.org/images/versioned/rstudio.html) for some good options. The one used in the example file is "rocker/r-bspm:jammy" which has is based on ubuntu jammy and has R installed and set up to use the bspm package so that R packages can be installed on linux from binary using `install.packages` as usual. 
+
+#### Optional customization fields:
+
+- imageReference: I have provided two pool template JSON files, one for windows and one for linux so you can just use one of those unless you have another reason to customize. (TODO: windows version did not work with example) This is basically the operating system that you want to use. You can choose from windows or linux options, but if you want to use docker you need to choose one that is docker compatible. To do this you can run `az batch pool supported-images list --filter "osType eq 'linux'"|tee test_linux.txt` this lists the supported images for the linux osType, change to 'windows' to see windows options, and outputs the result to a text file. I then searched the text file for "dockerCompatible" 
+
+Once you are happy with the JSON file you can create your pool by running
+`az batch pool create --json-file cloud_config/template_pool_cli.json`
+
+Run `az batch pool list` to see the status of the pool.
+
+### Create a job
+`az batch job create --pool-id test_pool_json_cli --id "test_job"`
+
+### Create a task
+Similar to creating a pool we create a task by referring to a JSON configuration file and the job id where the task should be assigned.
+
+The JSON file will depend on the task to be performed. "template_task_hello.json" reflects the simplest case where there are no input or output files. 
+
+```JSON
+{
+  "id": "sampleTask",
+  "commandLine": "R -e 'mean(mtcars$mpg)'",
+	"containerSettings": {
+    "imageName": "rocker/r-bspm:jammy",
+    "containerRunOptions": "--rm"
+	},
+  "userIdentity": {
+      "autoUser": {
+          "scope": "task",
+          "elevationLevel": "nonadmin"
+      }
+  }
+}
+```
+JSON file fields:
+- id: name of the task
+- commandLine: command line code to run. In this case because R is already installed on the docker container this just works. 
+- imageName: The DockerHub image to use
+- containerRunOptions: options that would normally be supplied with the `docker run` command
+- userIdentity: The identity of the user running the task, scope can be pool or task and elevationLevel can be admin or nonadmin.
+
+Run `az batch task create --json-file cloud_config/template_task_hello.json --job-id test_job` to start the task. This will return the status of the task to check on the status later run `az batch task show --job-id test_job --task-id sampleTask` this shows a lot of information, the main things to look at are "state" which should be active, running, or completed (active is the state when the task is starting up) and executionInfo which will tell you the result and start and end time. To get just this info you can use a query. `az batch task show --job-id test_job --task-id sampleTask --query "{state: state, executionInfo: executionInfo}" --output jsonc` 
+
+You can download files from the task with `az batch task file download --task-id sampleTask --job-id test_job --file-path "stdout.txt" --destination "/c/Users/endicotts/Documents/gitprojects/cloudDemo/run2_out.txt"`. stdout will show the console output on the machine and stderr.txt will show any error messages. 
+
+### Clean up
+
+**Always remember to delete your pools and jobs when they are complete**. We will be charged for as long as a pool is up regardless of whether anything is actually running on it. Tasks are deleted when the pool they are part of is deleted but jobs need to be deleted separately. 
+
+To delete the pool and job we created and confirm they were deleted run the following:
+
+```
+az batch job delete --job-id test_job
+az batch pool delete --pool-id test_pool_json_cli
+
+az batch job list --query "[].{id:id}"
+az batch pool list --query "[].{id:id}"
+```
+You may need to wait awhile for the pool to finish being deleted.
+
+### Access data in your task
+
+One thing to keep in mind is that your task has access to the internet so any method that you could normally use the access data and/or code over the internet should work in a script as long as you can set it up to work non-interactively. You might consider storing data on OSF or google drive or GitHub so that anyone can run your script and have the data load automatically. Another option that I will demonstrate here is to load your data onto an Azure Storage Container and connect it to your task. To do this we will use the az copy tool that we installed at the beginning. 
 
 Moving files to/from container from command line
 
-3)	Get the Shared Access Token URL for the container you want to access (See Step 2) above)
+Get a Shared Access Token for the container you want to access by running with the name of your own storage container. This will save it as a variable `sastoken`:
+
+```
+sastoken=`az storage container generate-sas --account-name ecdcwls --as-user --auth-mode login --expiry 2023-11-01 --name sendicott --permissions acdeimrtwxy`
+```
+To upload files use azcopy
+TODO: not working...
+`azcopy copy "analyses" https://ecdcwls.blob.core.windows.net/sendicott/$sastoken --recursive=true`
+
+
+
+
 4)	Run your command in the Windows cmd shell you will need the path to the azcopy executable unless you added it to your PATH
 The syntax for the copy command is:
 azcopy copy [source] [destination] [flags]

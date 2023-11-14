@@ -12,6 +12,7 @@ A repo for demonstrating how to use the cloud for a typical analysis in R
 Useful links:
 \itemize{
   \item \url{https://github.com/see24/cloudDemo}
+  \item \url{https://landscitech.github.io/cloudDemo/}
   \item Report bugs at \url{https://github.com/see24/cloudDemo/issues}
 }
 

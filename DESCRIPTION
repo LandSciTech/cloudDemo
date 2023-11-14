@@ -9,7 +9,8 @@ Authors@R: c(
            email   = "sarah.endicott@canada.ca",
            comment = c(ORCID = "0000-0001-9644-5343")))
 Description: A repo for demonstrating how to use the cloud for a typical analysis in R
-URL: https://github.com/see24/cloudDemo
+URL: https://github.com/see24/cloudDemo,
+    https://landscitech.github.io/cloudDemo/
 BugReports: https://github.com/see24/cloudDemo/issues
 License: GPL (>= 2)
 Encoding: UTF-8

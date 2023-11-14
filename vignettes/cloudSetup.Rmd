@@ -27,7 +27,7 @@ There are several options available for interacting with Azure Batch including t
 
 ### AzCopy
 1)	Download azcopy https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
-2)	Unzip into an easy to access directory ie C:\ or C:\Users\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).
+2)	Unzip into an easy to access directory ie C:\\ or C:\\Users\\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).
 
 
 ## Use Azure CLI to run an analysis

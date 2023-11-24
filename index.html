@@ -68,42 +68,8 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Research Compendium to demonstrate how to run an analysis in the cloud.</p>
-<div class="section level3">
-<h3 id="steps-to-create">Steps to create<a class="anchor" aria-label="anchor" href="#steps-to-create"></a>
-</h3>
-<p>This compendium was setup by creating a new GitHub repo on GitHub, cloning it by starting a new project from version control in RStudio, and running <code>rcompendium::new_compendium(create_repo = FALSE, renv = TRUE)</code></p>
-</div>
-<div class="section level3">
-<h3 id="content">Content<a class="anchor" aria-label="anchor" href="#content"></a>
-</h3>
-<p>This repository is structured as follow:</p>
-<ul>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/data" class="external-link"><code>data/</code></a>: contains all raw data required to perform analyses</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/analyses/" class="external-link"><code>analyses/</code></a>: contains R scripts to run each step of the workflow</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/outputs" class="external-link"><code>outputs/</code></a>: contains all the results created during the workflow</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/figures" class="external-link"><code>figures/</code></a>: contains all the figures created during the workflow</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/R" class="external-link"><code>R/</code></a>: contains R functions developed especially for this project</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/man" class="external-link"><code>man/</code></a>: contains help files of R functions</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/DESCRIPTION" class="external-link"><code>DESCRIPTION</code></a>: contains project metadata (author, date, dependencies, etc.)</p></li>
-<li><p><a href="https://github.com/see24/cloudDemo/tree/master/make.R" class="external-link"><code>make.R</code></a>: main R script to run the entire project by calling each R script stored in the <code>analyses/</code> folder</p></li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
-</h3>
-<p>Clone the repository, open R/RStudio and run:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"make.R"</span>)</span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
-</h3>
-<ul>
-<li>All required packages, listed in the <code>DESCRIPTION</code> file, will be installed (if necessary)</li>
-<li>All required packages and R functions will be loaded</li>
-<li>Some analyses listed in the <code>make.R</code> might take time</li>
-</ul>
-</div>
+<p>This repository hosts example data and configuration files for setting up R analyses in the cloud with Azure Batch. The Articles give detailed instructions for setting up an analysis using the Azure CLI command line tool.</p>
+<p>The analysis folder contains scripts and data for a mock analysis and cloud_config contains template JSON files to use with Azure CLI</p>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
@@ -140,7 +106,6 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://choosealicense.com/licenses/gpl-2.0/" class="external-link"><img src="https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg" alt="License: GPL (&gt;= 2)"></a></li>
-<li><a href="#"><img src="https://img.shields.io/badge/dependencies-7/106-orange?style=flat" alt="Dependencies"></a></li>
 </ul>
 </div>
 

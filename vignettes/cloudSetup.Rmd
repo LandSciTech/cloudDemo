@@ -3,8 +3,10 @@ title: "Setting up cloud processing with Azure Batch"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Setting up cloud processing with Azure Batch}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -20,14 +22,10 @@ Azure Batch is one of many Azure services that can be used to run analyses in th
 
 There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. 
 
-## Install Azure CLI and AzCopy
+## Install Azure CLI
 
 ### Azure CLI
 1) Install using install wizard https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli#install-or-update
-
-### AzCopy
-1)	Download azcopy https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
-2)	Unzip into an easy to access directory ie C:\\ or C:\\Users\\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).
 
 
 ## Use Azure CLI to run an analysis
@@ -97,7 +95,7 @@ Run `az batch pool list` to see the status of the pool.
 ### Create a task
 Similar to creating a pool we create a task by referring to a JSON configuration file and the job id where the task should be assigned.
 
-The JSON file will depend on the task to be performed. "template_task_hello.json" reflects the simplest case where there are no input or output files. 
+The JSON file will depend on the task to be performed. "template_task_hello.json" reflects the simplest case where there are no input or output files and it runs an R function directly from the command line. 
 
 ```JSON
 {
@@ -116,15 +114,31 @@ The JSON file will depend on the task to be performed. "template_task_hello.json
 }
 ```
 JSON file fields:
+
 - id: name of the task
 - commandLine: command line code to run. In this case because R is already installed on the docker container this just works. 
 - imageName: The DockerHub image to use
 - containerRunOptions: options that would normally be supplied with the `docker run` command
 - userIdentity: The identity of the user running the task, scope can be pool or task and elevationLevel can be admin or nonadmin.
 
-Run `az batch task create --json-file cloud_config/template_task_hello.json --job-id test_job` to start the task. This will return the status of the task to check on the status later run `az batch task show --job-id test_job --task-id sampleTask` this shows a lot of information, the main things to look at are "state" which should be active, running, or completed (active is the state when the task is starting up) and executionInfo which will tell you the result and start and end time. To get just this info you can use a query. `az batch task show --job-id test_job --task-id sampleTask --query "{state: state, executionInfo: executionInfo}" --output jsonc` 
+The task will start to execute as soon as we create the task. 
+```
+az batch task create --json-file cloud_config/template_task_hello.json --job-id test_job
+``` 
+We can check the status of the task and filter the output with a query to only get the information we need. 
+```
+az batch task show --job-id test_job --task-id sampleTask
 
-You can download files from the task with `az batch task file download --task-id sampleTask --job-id test_job --file-path "stdout.txt" --destination "/c/Users/endicotts/Documents/gitprojects/cloudDemo/run2_out.txt"`. stdout will show the console output on the machine and stderr.txt will show any error messages. 
+az batch task show --job-id test_job --task-id sampleTask --query "{state: state, executionInfo: executionInfo}" --output jsonc
+```
+The "state" should be active, running, or completed (active is the state when the task is starting up) and executionInfo will tell you the result (success or failure) and start and end time. 
+
+To find out more about what is going on in you task you can download the stdout or stderr files.  stdout.txt will show the console output on the machine and stderr.txt will show any error messages.
+
+```
+az batch task file download --task-id sampleTask --job-id test_job --file-path "stdout.txt" --destination "./run_out.txt"
+```
+ 
 
 ### Clean up
 
@@ -136,41 +150,148 @@ To delete the pool and job we created and confirm they were deleted run the foll
 az batch job delete --job-id test_job
 az batch pool delete --pool-id test_pool_json_cli
 
-az batch job list --query "[].{id:id}"
-az batch pool list --query "[].{id:id}"
+az batch job list --query "[].{id:id, state:state}"
+az batch pool list --query "[].{id:id, state:state}"
 ```
 You may need to wait awhile for the pool to finish being deleted.
 
-### Access data in your task
+## Access data in your task
 
-One thing to keep in mind is that your task has access to the internet so any method that you could normally use the access data and/or code over the internet should work in a script as long as you can set it up to work non-interactively. You might consider storing data on OSF or google drive or GitHub so that anyone can run your script and have the data load automatically. Another option that I will demonstrate here is to load your data onto an Azure Storage Container and connect it to your task. To do this we will use the az copy tool that we installed at the beginning. 
+One thing to keep in mind is that your task has access to the internet so any method that you could normally use to access data and/or code over the internet should work in a script as long as you can set it up to work non-interactively. You might consider storing data on OSF or google drive or GitHub so that anyone can run your script and have the data load automatically. Another option that I will demonstrate here is to load your data onto an Azure Storage Container and connect it to your task. This uses the azcopy tool that we installed at the beginning in the background. 
 
-Moving files to/from container from command line
+To run this example clone this GitHub repo by running  `usethis::create_from_github("LandSciTech/cloudDemo")` in R. Then you will have the analyses folder which contains two folders:
 
-Get a Shared Access Token for the container you want to access by running with the name of your own storage container. This will save it as a variable `sastoken`:
+- scripts:
+    - script_read_csv.R A super simple R script that reads a csv subsets the table and saves a new csv
+    - run_script.sh A bash script that runs the R script
+- data:
+    - raw-data:
+        - fruits.csv data used by the script
+    - derived-data: 
+        - just has a README for now but is where results are stored.
+
+
+### Upload files to container
+First, get a Shared Access Token for the container you want to access by running the below replacing "sendicott" with the name of your own storage container. This will save it as a variable `sastoken`, the token will expire after one day, in most real use cases I would change the expiry to more like 30 days. The `sasurl` is the full url for the container with the SAS token included and can be used as a single argument in some cases.
 
 ```
-sastoken=`az storage container generate-sas --account-name ecdcwls --as-user --auth-mode login --expiry 2023-11-01 --name sendicott --permissions acdeimrtwxy`
+end=`date -u -d "1 day" '+%Y-%m-%dT%H:%MZ'`
+
+sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end --name sendicott --permissions racwdli -o tsv --auth-mode login --as-user`
+
+sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken
 ```
-To upload files use azcopy
-TODO: not working...
-`azcopy copy "analyses" https://ecdcwls.blob.core.windows.net/sendicott/$sastoken --recursive=true`
+
+Then copy all files from a local directory to the container url created above then list the filenames in the container.
+
+```
+az storage copy -d $sasurl -s analyses --recursive
+
+az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken --query "[].{name:name}"
+```
+
+### Connect container to task
+To access files in the container from the task we can modify the simple JSON above to add some additional options.
+
+The "outputFiles" option lets you link the container as the place where output files will be stored. Link to your container by replacing the "containerUrl" with your `sasurl` defined above. Use "path" to set the location within the container where you want the file to be saved. Under filePattern select the file to save, either with a path to a specific file or a pattern to match multiple files. Note that the file upload only occurs when the task completes so if the task ends without completing no files will be saved.  
+
+Below I have defined two "outputFiles" one to save the results created in derived-data and one to store the stdout.txt and stderr.txt files that show the console output and error output. The stdout files are located above the working directory of the task which is why we need "../"
 
 
+Adding the input files is much simpler, in this case you just need to supply the name of the container. All the files in the container will be copied into the working directory of the task.  
+
+In addition, I have changed the commandLine to run the bash script stored in the scripts folder. The bash script is not necessary in this simple example but is useful if you want to run multiple scripts or do anything else from the commandLine before running a script.  
+
+```JSON
+{
+  "id": "test_outFile",
+  "commandLine": "sh analyses/scripts/run_script.sh",
+  "resourceFiles": [{
+		"autoStorageContainerName": "sendicott"
+	}
+	],
+  "outputFiles": [
+	{
+    "destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
+				"path": "logs"
+			}
+		},
+		"filePattern": "../std*.txt",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	},
+	{
+		"destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
+				"path": "analyses/data/derived-data/output_price2.csv"
+			}
+		},
+		"filePattern": "analyses/data/derived-data/output_price2.csv",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	}
+	],
+	"containerSettings": {
+		"imageName": "rocker/r-ubuntu:jammy",
+		"containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "admin"
+        }
+    }
+}
+```
+Follow the same process as above to create a pool, job and task, this time with our new JSON file
+```
+az batch pool create --json-file cloud_config/template_pool_cli.json
+az batch job create --pool-id test_pool_json_cli --id "test_job"
+az batch task create --json-file cloud_config/template_task_with_file_in_out.json --job-id test_job
+
+```
+
+Check the task status and confirm that files have been uploaded to the container
+```
+az batch task show --job-id test_job --task-id test_outFile --query "{state: state, executionInfo: executionInfo}" --output jsonc
+
+az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken --query "[].{name:name}"
+```
+
+Download the files that you want to save locally. 
+```
+az storage copy -s https://ecdcwls.blob.core.windows.net/sendicott/analyses/data/derived-data?$sastoken -d analyses/data --recursive
+```
 
 
-4)	Run your command in the Windows cmd shell you will need the path to the azcopy executable unless you added it to your PATH
-The syntax for the copy command is:
-azcopy copy [source] [destination] [flags]
-where source and destination should be either the local file path or container SAS URL 
-To download all the files in the directory s4:
-.\azcopy\azcopy.exe copy "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>" "C:\Users\endicotts\Documents\gitprojects\Caribou-Demographic-Projection-Paper"  --recursive
+Delete the analyses folder from your container to remove all the files. This doesn't have to happen right away but I try not to leave things here since we have other long term storage solutions and I don't want to clutter the container. 
 
-To delete all the files in the directory now that they are downloaded:
--	Use --dry-run to list the files
-.\azcopy\azcopy.exe rm --recursive=true --dry-run "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>"
+```
+az storage remove -c sendicott --account-name ecdcwls --sas-token $sastoken -n analyses --recursive
+```
 
--	Then actually delete them
-.\azcopy\azcopy.exe rm --recursive=true "https://ecdcwls.blob.core.windows.net/sendicott/s4<SAS>"
-See more detailed documentation of commands and their arguments here
+To delete all files in the container don't supply a name argument
+```
+az storage remove -c sendicott --account-name ecdcwls --sas-token $sastoken  --recursive
+```
+
+Delete the job and pool so that we are no longer charged. Note after you do this the local copy on your machine is the only copy of the files from the analysis. 
+```
+az batch job delete --job-id test_job
+az batch pool delete --pool-id test_pool_json_cli
+
+az batch job list --query "[].{id:id, state:state}"
+az batch pool list --query "[].{id:id, state:state}"
+```
+
+## Install AzCopy if needed
+I had already installed it but I think az cli might do it for you. Try the az storage commands above and see if it will do the install. If not follow these instructions.
+
+1)	Download azcopy https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
+2)	Unzip into an easy to access directory ie C:\\ or C:\\Users\\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).
 

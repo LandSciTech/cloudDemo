@@ -3,7 +3,8 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   cloudSetup: cloudSetup.html
-last_built: 2023-11-24T21:49Z
+  parallelization: parallelization.html
+last_built: 2024-01-05T21:34Z
 urls:
   reference: https://landscitech.github.io/cloudDemo/reference
   article: https://landscitech.github.io/cloudDemo/articles

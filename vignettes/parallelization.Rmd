@@ -1,0 +1,28 @@
+---
+title: "Parallelization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Parallelization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment  = "#>")
+```
+
+This tutorial explains different methods for using the cloud to run an analysis in parallel.
+
+## Running the analysis in parallel
+So far our analysis is run sequentially so it will not be able to take advantage of the multiple cores available on a cloud machine. To make use of parallel computing we can set up our script to run each model on a separate core. Because this example is so simple I have added a delay in the function so we can see the benefit of running in parallel. There are many ways to do this and I will explain a few options. One option is to create a parallel backend in R using something like the future package. This can be quite straight forward and there are packages to connect this familiar methods of iterating (eg for loops, lapply or purrr). This can get a bit tricky in that you are typically running only parts of the script on multiple cores you need to make sure the right dependencies are available on the workers. future manages this for the most part but see https://future.futureverse.org/articles/future-4-issues.html for tips when that fails.  
+
+### Using the future and furrr packages
+
+The future package sets up the infrastructure needed to run things in the background. To initialize this you run `future::plan("multisession")` which will use all `future::availableCores()` by default. See script "analyses/02_run_model_furrr.R" for an example. 
+
+### Using future and foreach
+
+If you usually use for loops then the foreach package might be easier to use. This can be used with future to create the backend using the doFuture package. 
+
+

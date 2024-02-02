@@ -98,7 +98,9 @@ including the Azure <a href="https://portal.azure.com/" class="external-link">we
 and the Azure command line interface (CLI). This tutorial will focus on
 the Azure CLI method since it is the simplest and fastest method. In
 both cases you need to be on the ECCC network to access the cloud,
-either in the office or on VPN.</p>
+either in the office or on VPN. Azure CLI can be used on any terminal in
+Windows but the code below is written assuming you are using a Bash
+Terminal and will not run exactly as written in other terminals.</p>
 </div>
 <div class="section level2">
 <h2 id="install-azure-cli">Install Azure CLI<a class="anchor" aria-label="anchor" href="#install-azure-cli"></a>
@@ -119,8 +121,8 @@ either in the office or on VPN.</p>
 <h3 id="sign-in">Sign in<a class="anchor" aria-label="anchor" href="#sign-in"></a>
 </h3>
 <ol style="list-style-type: decimal">
-<li>Run <code>az login</code> in the command prompt. This will open a
-web browser for you to login.</li>
+<li>Run <code>az login</code> in the terminal. This will open a web
+browser for you to login.</li>
 <li>Run
 <code>az batch account login -g EcDc-WLS-rg -n ecdcwlsbatch</code> to
 connect to the “EcDc-WLS-rg” resource group and “ecdcwlsbatch” service

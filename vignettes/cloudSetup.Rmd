@@ -172,7 +172,12 @@ To run this example clone this GitHub repo by running  `usethis::create_from_git
 
 
 ### Upload files to container
-First, get a Shared Access Token for the container you want to access by running the below replacing "sendicott" with the name of your own storage container. This will save it as a variable `sastoken`, the token will expire after one day, in most real use cases I would change the expiry to more like 30 days. The `sasurl` is the full url for the container with the SAS token included and can be used as a single argument in some cases.
+If you don't have an existing container under your name in the Azure storage account create one using your first initial and last name.
+```
+az storage container create --name jdoe --account-name ecdcwls --auth-mode login
+```
+
+Next, get a Shared Access Token for the container you want to access by running the below replacing "sendicott" with the name of your own storage container. This will save it as a variable `sastoken`, the token will expire after one day, in most real use cases I would change the expiry to as long as you expect the analysis to run. The `sasurl` is the full url for the container with the SAS token included and can be used as a single argument in some cases.
 
 ```
 end=`date -u -d "1 day" '+%Y-%m-%dT%H:%MZ'`

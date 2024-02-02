@@ -193,12 +193,11 @@ az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken -
 ### Connect container to task
 To access files in the container from the task we can modify the simple JSON above to add some additional options.
 
-The "outputFiles" option lets you link the container as the place where output files will be stored. Link to your container by replacing the "containerUrl" with your `sasurl` defined above. Use "path" to set the location within the container where you want the file to be saved. Under filePattern select the file to save, either with a path to a specific file or a pattern to match multiple files. Note that the file upload only occurs when the task completes so if the task ends without completing no files will be saved.  
+The "outputFiles" option lets you link the container as the place where output files will be stored. Use "path" to set the location within the container where you want the file to be saved. Under filePattern select the file to save, either with a path to a specific file or a pattern to match multiple files. Note that the file upload only occurs when the task completes so if the task ends without completing no files will be saved.  
 
 Below I have defined two "outputFiles" one to save the results created in derived-data and one to store the stdout.txt and stderr.txt files that show the console output and error output. The stdout files are located above the working directory of the task which is why we need "../"
 
-
-Adding the input files is much simpler, in this case you just need to supply the name of the container. All the files in the container will be copied into the working directory of the task.  
+Adding the input files is much simpler, in this case you just need to supply the name of the container to the autoStorageContainerName option. All the files in the container will be copied into the working directory of the task.  
 
 In addition, I have changed the commandLine to run the bash script stored in the scripts folder. The bash script is not necessary in this simple example but is useful if you want to run multiple scripts or do anything else from the commandLine before running a script.  
 
@@ -248,12 +247,19 @@ In addition, I have changed the commandLine to run the bash script stored in the
     }
 }
 ```
-Follow the same process as above to create a pool, job and task, this time with our new JSON file
+Next we need to replace the `<sastoken>` placeholder in the template with the value of the `sastoken` variable we created above and save the resulting file. We do this to avoid saving the sastoken in the template script so it won't accidentally get shared with others. We can delete the script with the file once we launch the task since it is easy to recreate it when needed. 
+
+```
+sed 's/<sastoken>/'${sastoken//&/\\&}'/g' cloud_config/template_task_with_file_in_out.json > cloud_config/task_to_use.json
+```
+
+Follow the same process as above to create a pool, job and task, this time with our new JSON file. Then delete the modified JSON file that contains the sastoken
 ```
 az batch pool create --json-file cloud_config/template_pool_cli.json
 az batch job create --pool-id test_pool_json_cli --id "test_job"
-az batch task create --json-file cloud_config/template_task_with_file_in_out.json --job-id test_job
+az batch task create --json-file cloud_config/task_to_use.json --job-id test_job
 
+rm cloud_config/task_to_use.json
 ```
 
 Check the task status and confirm that files have been uploaded to the container
@@ -290,7 +296,8 @@ az batch pool list --query "[].{id:id, state:state}"
 ```
 
 ## Install AzCopy if needed
-I had already installed it but I think az cli might do it for you. Try the az storage commands above and see if it will do the install. If not follow these instructions.
+
+AzCopy is another command line tool that is used by the az storage commands above. It should automatically be installed the first time you run one of them but if not here are the instructions for downloading it. 
 
 1)	Download azcopy https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
 2)	Unzip into an easy to access directory ie C:\\ or C:\\Users\\username you will need to navigate the command line to this directory to run commands unless you [add azcopy to your PATH](https://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/).

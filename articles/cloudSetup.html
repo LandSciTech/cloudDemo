@@ -342,13 +342,17 @@ the table and saves a new csv</li>
 <div class="section level3">
 <h3 id="upload-files-to-container">Upload files to container<a class="anchor" aria-label="anchor" href="#upload-files-to-container"></a>
 </h3>
-<p>First, get a Shared Access Token for the container you want to access
+<p>If you don’t have an existing container under your name in the Azure
+storage account create one using your first initial and last name.</p>
+<pre><code>az storage container create --name jdoe --account-name ecdcwls --auth-mode login</code></pre>
+<p>Next, get a Shared Access Token for the container you want to access
 by running the below replacing “sendicott” with the name of your own
 storage container. This will save it as a variable
 <code>sastoken</code>, the token will expire after one day, in most real
-use cases I would change the expiry to more like 30 days. The
-<code>sasurl</code> is the full url for the container with the SAS token
-included and can be used as a single argument in some cases.</p>
+use cases I would change the expiry to as long as you expect the
+analysis to run. The <code>sasurl</code> is the full url for the
+container with the SAS token included and can be used as a single
+argument in some cases.</p>
 <pre><code>end=`date -u -d "1 day" '+%Y-%m-%dT%H:%MZ'`
 
 sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end --name sendicott --permissions racwdli -o tsv --auth-mode login --as-user`
@@ -385,50 +389,50 @@ of the task.</p>
 stored in the scripts folder. The bash script is not necessary in this
 simple example but is useful if you want to run multiple scripts or do
 anything else from the commandLine before running a script.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"test_outFile"</span><span class="fu">,</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"commandLine"</span><span class="fu">:</span> <span class="st">"sh analyses/scripts/run_script.sh"</span><span class="fu">,</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"resourceFiles"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"autoStorageContainerName"</span><span class="fu">:</span> <span class="st">"sendicott"</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"outputFiles"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"destination"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"container"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"containerUrl"</span><span class="fu">:</span> <span class="st">"https://ecdcwls.blob.core.windows.net/sendicott/?&lt;sastoken&gt;"</span><span class="fu">,</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"path"</span><span class="fu">:</span> <span class="st">"logs"</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"filePattern"</span><span class="fu">:</span> <span class="st">"../std*.txt"</span><span class="fu">,</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"uploadOptions"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"uploadCondition"</span><span class="fu">:</span> <span class="st">"taskcompletion"</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"destination"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"container"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"containerUrl"</span><span class="fu">:</span> <span class="st">"https://ecdcwls.blob.core.windows.net/sendicott/?&lt;sastoken&gt;"</span><span class="fu">,</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"path"</span><span class="fu">:</span> <span class="st">"analyses/data/derived-data/output_price2.csv"</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"filePattern"</span><span class="fu">:</span> <span class="st">"analyses/data/derived-data/output_price2.csv"</span><span class="fu">,</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"uploadOptions"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"uploadCondition"</span><span class="fu">:</span> <span class="st">"taskcompletion"</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"containerSettings"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"imageName"</span><span class="fu">:</span> <span class="st">"rocker/r-ubuntu:jammy"</span><span class="fu">,</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"containerRunOptions"</span><span class="fu">:</span> <span class="st">"--rm"</span></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"userIdentity"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"autoUser"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"scope"</span><span class="fu">:</span> <span class="st">"task"</span><span class="fu">,</span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"elevationLevel"</span><span class="fu">:</span> <span class="st">"admin"</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"test_outFile"</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"commandLine"</span><span class="fu">:</span> <span class="st">"sh analyses/scripts/run_script.sh"</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"resourceFiles"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"autoStorageContainerName"</span><span class="fu">:</span> <span class="st">"sendicott"</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"outputFiles"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"destination"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"container"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"containerUrl"</span><span class="fu">:</span> <span class="st">"https://ecdcwls.blob.core.windows.net/sendicott/?&lt;sastoken&gt;"</span><span class="fu">,</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"path"</span><span class="fu">:</span> <span class="st">"logs"</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"filePattern"</span><span class="fu">:</span> <span class="st">"../std*.txt"</span><span class="fu">,</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"uploadOptions"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"uploadCondition"</span><span class="fu">:</span> <span class="st">"taskcompletion"</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"destination"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"container"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"containerUrl"</span><span class="fu">:</span> <span class="st">"https://ecdcwls.blob.core.windows.net/sendicott/?&lt;sastoken&gt;"</span><span class="fu">,</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"path"</span><span class="fu">:</span> <span class="st">"analyses/data/derived-data/output_price2.csv"</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"filePattern"</span><span class="fu">:</span> <span class="st">"analyses/data/derived-data/output_price2.csv"</span><span class="fu">,</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"uploadOptions"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"uploadCondition"</span><span class="fu">:</span> <span class="st">"taskcompletion"</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"containerSettings"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"imageName"</span><span class="fu">:</span> <span class="st">"rocker/r-ubuntu:jammy"</span><span class="fu">,</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"containerRunOptions"</span><span class="fu">:</span> <span class="st">"--rm"</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"userIdentity"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"autoUser"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"scope"</span><span class="fu">:</span> <span class="st">"task"</span><span class="fu">,</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"elevationLevel"</span><span class="fu">:</span> <span class="st">"admin"</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>Next we need to replace the <code>&lt;sastoken&gt;</code> placeholder
 in the template with the value of the <code>sastoken</code> variable we
 created above and save the resulting file. We do this to avoid saving

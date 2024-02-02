@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   cloudSetup: cloudSetup.html
   parallelization: parallelization.html
-last_built: 2024-02-02T18:48Z
+last_built: 2024-02-02T20:09Z
 urls:
   reference: https://landscitech.github.io/cloudDemo/reference
   article: https://landscitech.github.io/cloudDemo/articles

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 Azure Batch is one of many Azure services that can be used to run analyses in the cloud. It uses a hierarchy of **Pools** which contain **Jobs** which contain **Tasks**. A **Pool** is a group of **Nodes** (similar to virtual machines) which are the computers that will run the analyses. When a pool is created you choose the number of nodes and configure the operating system, RAM and number of cores that each node will have. **Jobs** are used for scheduling different related tasks, in simple cases they are just a folder that contains your tasks. **Tasks** contain the code that you want the node to run and information on where to get data from and save it to. 
 
-There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. 
+There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. Azure CLI can be used on any terminal in Windows but the code below is written assuming you are using a Bash Terminal and will not run exactly as written in other terminals.
 
 ## Install Azure CLI
 
@@ -31,7 +31,7 @@ There are several options available for interacting with Azure Batch including t
 ## Use Azure CLI to run an analysis
 
 ### Sign in
-1) Run `az login` in the command prompt. This will open a web browser for you to login.
+1) Run `az login` in the terminal. This will open a web browser for you to login.
 2) Run `az batch account login -g EcDc-WLS-rg -n ecdcwlsbatch` to connect to the "EcDc-WLS-rg" resource group and "ecdcwlsbatch" service name.
 3) Run `az batch pool list` to show any existing pools.
 *Note: if you get an error at this point saying "This request is not authorized to perform this operation." you are likely not signed on to the VPN, sign on and try again.*  

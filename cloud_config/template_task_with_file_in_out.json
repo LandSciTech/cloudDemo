@@ -9,7 +9,7 @@
 	{
     "destination": {
 			"container": {
-				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?se=2023-11-25T18%3A36Z&sp=racwdli&sv=2022-11-02&sr=c&skoid=f6f34807-3fcf-456f-b58e-f83b3f6dd761&sktid=740c5fd3-6e8b-4176-9cc9-454dbe4e62c4&skt=2023-11-24T18%3A37%3A00Z&ske=2023-11-25T18%3A36%3A00Z&sks=b&skv=2022-11-02&sig=Rti0RmPzvmX4MCf/dOJ7mozBONIYW7ULmSDUGlCZtXs%3D",
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
 				"path": "logs"
 			}
 		},
@@ -21,7 +21,7 @@
 	{
 		"destination": {
 			"container": {
-				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?se=2023-11-25T18%3A36Z&sp=racwdli&sv=2022-11-02&sr=c&skoid=f6f34807-3fcf-456f-b58e-f83b3f6dd761&sktid=740c5fd3-6e8b-4176-9cc9-454dbe4e62c4&skt=2023-11-24T18%3A37%3A00Z&ske=2023-11-25T18%3A36%3A00Z&sks=b&skv=2022-11-02&sig=Rti0RmPzvmX4MCf/dOJ7mozBONIYW7ULmSDUGlCZtXs%3D",
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
 				"path": "analyses/data/derived-data/output_price2.csv"
 			}
 		},

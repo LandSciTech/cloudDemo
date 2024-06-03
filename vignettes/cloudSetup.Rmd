@@ -22,11 +22,14 @@ Azure Batch is one of many Azure services that can be used to run analyses in th
 
 There are several options available for interacting with Azure Batch including the Azure [web portal](https://portal.azure.com/) and the Azure command line interface (CLI). This tutorial will focus on the Azure CLI method since it is the simplest and fastest method. In both cases you need to be on the ECCC network to access the cloud, either in the office or on VPN. Azure CLI can be used on any terminal in Windows but the code below is written assuming you are using a Bash Terminal and will not run exactly as written in other terminals.
 
+## Get Access
+To be added to the LERS Azure Batch account email Sarah Endicott, she will email the CCOE (Cloud Centre of Expertise) to ask them to give your account the required permissions. I recommend allowing a week for this process.  
+
 ## Install Azure CLI
 
 ### Azure CLI
 1) Install using install wizard https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli#install-or-update
-
+If you don't have [elevated privileges](https://ecollab.ncr.int.ec.gc.ca/org/11001/Shared%20Documents/Elevated%20Privileges%20Request%20Form_v4.0.pdf) you will need to call service desk to have them complete the installation for you.
 
 ## Use Azure CLI to run an analysis
 

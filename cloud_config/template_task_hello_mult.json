@@ -1,0 +1,14 @@
+{
+    "id": "sampleTask<taskid>",
+    "commandLine": "R -e 'print(<taskid>);mean(mtcars$mpg);Sys.sleep(200)'",
+	"containerSettings": {
+    "imageName": "rocker/r-bspm:jammy",
+    "containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "nonadmin"
+        }
+    }
+}

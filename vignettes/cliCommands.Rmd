@@ -1,0 +1,283 @@
+---
+title: "Useful Azure CLI commands"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Useful Azure CLI commands}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+
+This page is intended as a list of useful commands to refer back to when using Azure CLI. Feel free to add your own by forking the [repo](https://github.com/LandSciTech/compendiumDemo), or creating an [issue](https://github.com/LandSciTech/compendiumDemo/issues). Some things are Azure CLI specific but some are just helpful Bash things. 
+
+## Microsoft help pages
+These have a lot of info and are where I have figured out most things but there is so much there it is a little overwhelming.
+
+- [Onboarding cheat sheet](https://learn.microsoft.com/en-us/cli/azure/cheat-sheet-onboarding)
+- [Reference index A to Z](https://learn.microsoft.com/en-us/cli/azure/reference-index)
+
+## Useful commands
+
+### List pools 
+`az batch pool list` returns all the info for every pool. You can use `--query` to simplify this. The query below returns the id and information on numbers of nodes for all pools. I have also changed the `--output` from the default json to table since it is more compact. `query` and `output` are global parameters available for most functions. 
+
+```{bash}
+az batch pool list \
+--query "[].{name:id, vmSize:vmSize,  curNodes: currentDedicatedNodes,tarNodes: targetDedicatedN
+odes, allocState:allocationState}" \
+--output table
+
+#> Name             VmSize          CurNodes    TarNodes    AllocState
+#> ---------------  --------------  ----------  ----------  ------------
+#> amartin_pool4    standard_d8_v3  1           1           steady
+#> amartin_pool5    standard_d8_v3  1           1           steady
+#> amartin_pool6    standard_d8_v3  1           1           steady
+#> sendicott_roads  standard_e2_v3  1           0           resizing
+```
+To break down the query, the first `[]` means we are going to get values from each element of an array. The part in `{}` chooses which properties to return and what their display names should be. These are JMESPath querys and they can be very powerful. See this [help page](https://learn.microsoft.com/en-us/cli/azure/query-azure-cli?tabs=concepts%2Cbash) for more details. 
+
+For example, we can also add a filter to the query:
+```{bash}
+az batch pool list \
+--query "[?id == 'sendicott_roads'].{name:id, vmSize:vmSize,  curNodes: currentDedicatedNodes,tarNodes: targetDedicatedNodes, allocState:allocationState}" \
+--output table
+#> Name             VmSize          CurNodes    TarNodes    AllocState
+#> ---------------  --------------  ----------  ----------  ------------
+#> sendicott_roads  standard_e2_v3  1           0           resizing
+
+
+az batch pool list \
+--query "[?contains(id, 'amartin')].{name:id, vmSize:vmSize,  curNodes:currentDedicatedNodes,tarNodes: targetDedicatedNodes, allocState:allocationState}" \
+--output table
+#> Name            VmSize          CurNodes    TarNodes    AllocState
+#> ----------      --------------  ----------  ----------  ------------
+#> amartin_pool4   standard_d8_v3  1           1           steady
+#> amartin_pool5   standard_d8_v3  1           1           steady
+#> amartin_pool6   standard_d8_v3  1           1           steady
+```
+
+### Get subnet id for use in JSON pool files
+We can also save the output of a query to a variable and use it in future commands
+```{bash}
+subnetid=$(az network vnet subnet list --resource-group EcDc-WLS-rg --vnet-name EcDc-WLS-vnet \
+--query "[?name=='EcDc-WLS_compute-cluster-snet'].id" --output tsv)
+```
+
+### Get sastoken and sasurl
+```{bash}
+# 7 days seems to be the max that the cli will allow
+end=`date -u -d "7 days" '+%Y-%m-%dT%H:%MZ'`
+sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end --name sendicott --permissions racwdli -o tsv --auth-mode login --as-user`
+
+sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken
+
+```
+
+
+### List files in storage container
+```{bash}
+az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken \
+--query "[].{name:name}" --output yaml
+```
+
+
+### Copy file to storage
+```{bash}
+sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken
+
+az storage copy -d $sasurl -s analyses/scripts/run_script.sh
+```
+
+### Copy folder to storage
+If you copy individual files they will end up in the root of the storage container, if you copy a folder using `--recursize` the folder structure will be reflected in the storage container. If you copy the contents of the folder using a wildcard (path/to/folder/*) it will copy each file to the root of the container. 
+
+```{bash}
+az storage copy -d $sasurl -s analyses/scripts --recursive
+az storage copy -d $sasurl -s "analyses/scripts/*"
+```
+
+### Copy/download files from storage
+You can download files using a pattern. The below will download all files in sendicott container that end in ".R" and save them in a new folder called scripts2  
+```{bash}
+az storage copy -s https://ecdcwls.blob.core.windows.net/sendicott/*?$sastoken \
+-d "analyses/scripts2" --include-pattern "*.R"
+```
+
+Or by adding the folder name after the container name and before `?$sastoken`:
+Using recursive will copy the folder with its contents:
+```{bash}
+az storage copy -s https://ecdcwls.blob.core.windows.net/sendicott/scripts?$sastoken \
+-d "analyses/scripts3" --recursive
+```
+
+But using the folder name followed by * will just copy each file
+
+```{bash}
+az storage copy -s https://ecdcwls.blob.core.windows.net/sendicott/scripts/*?$sastoken \
+-d "analyses/scripts4"
+```
+
+### Delete files on storage
+
+Remove files matching pattern:
+
+```{bash}
+az storage remove -c sendicott --include-pattern "*.rds" --account-name ecdcwls --sas-token $sastoken --recursive
+
+```
+
+Delete one folder
+
+```{bash}
+az storage remove -c sendicott -n scripts --account-name ecdcwls \
+--sas-token $sastoken --recursive
+
+```
+
+Delete everything in container
+Note you can also exclude files matching a pattern with e.g. `--exclude-pattern "*.gpkg"`.
+```{bash}
+az storage remove -c sendicott --account-name ecdcwls \
+--sas-token $sastoken --recursive
+```
+
+### Create pool, job, task
+
+```{bash}
+poolName="test_pool_json_cli"
+jobName="sendicott_job_test"
+
+az batch pool create --json-file cloud_config/template_pool_cli.json
+az batch job create --pool-id $poolName --id $jobName
+az batch task create --json-file cloud_config/template_task_hello.json --job-id $jobName
+```
+
+Or create many tasks with a loop. This assumes you have created may different task jsons with different files that are numbered.
+```{bash}
+for rowi in {1..27}
+do
+  az batch task create --json-file analysis/cloud/task_jsons/task_roads_$rowi.json --job-id $jobName
+done
+```
+
+### Reactivate task
+This will re-run a task that failed. Useful if you fixed one of the scripts and re-uploaded it or if the error was a stochastic thing and you want to try again. Won't re-run successful tasks 
+```{bash}
+az batch task reactivate --job-id $jobName --task-id sampleTask
+```
+
+### Delete Pool, job, task
+
+```{bash}
+# you will have to confirm in the console or add --yes
+az batch job delete --job-id $jobName
+az batch pool delete --pool-id $poolName
+
+# if you delete the pool the task is deleted anyway
+az batch task delete --task-id sampleTask --job-id $jobName --yes
+```
+
+### Monitoring tasks
+```{bash}
+# details for a single task filtered by query
+az batch task show --job-id $jobName --task-id sampleTask \
+--query "{state: state, executionInfo: executionInfo}" --output yaml
+
+# Summary of state for all tasks in job
+az batch job task-counts show --job-id $jobName
+
+# Get other info from multiple tasks
+az batch task list --job-id $jobName \
+--query "{tasks: [].[id, executionInfo.{st:startTime, end:endTime}][]}" --output yaml
+```
+
+### Download output file from a task
+```{bash}
+az batch task file download --task-id sampleTask --job-id $jobName \
+--file-path "stdout.txt" --destination "cloud_config/stdout.txt"
+
+# print the file to console
+cat "cloud_config/stdout.txt"
+
+# or print the last n lines 
+tail "cloud_config/stdout.txt" -n 5
+
+```
+
+### Manage nodes in pool
+When running many tasks in a pool I usually start one node, check that it is working and then resize to the desired number of nodes. 
+```{bash}
+# set target dedicated nodes
+az batch pool resize --pool-id $poolName --target-dedicated-nodes 3
+
+# check pool node counts
+az batch pool list  \
+--query "[?id=='"$poolName"'].{curNodes: currentDedicatedNodes,tarNodes: targetDedicatedNodes, allocState:allocationState}" \
+--output yaml
+
+# check node state
+az batch node list --pool-id $poolName --query "{nodes: [].[id, state][]}" --output json
+```
+
+### Enable autoscaling
+Once a pool is running well and I am confident that results will be saved as expected I enable autoscaleing so that we will not be charged after the task is finished running. This will mean that the task is deleted after it completes so you won't be able to look at logs or files on it afterwards. 
+This formula is still a bit mysterious to me
+```{bash}
+# prompt auto scaleing of pool by changing time interval
+# enabling this as soon as the tasks are created seems to make it think there are no tasks
+az batch pool autoscale enable --pool-id $poolName --auto-scale-evaluation-interval "PT5M"\
+ --auto-scale-formula 'percentage = 70;
+ span = TimeInterval_Second * 15;
+ $samples = $ActiveTasks.GetSamplePercent(span);
+ $tasks = $samples < percentage ? max(0,$ActiveTasks.GetSample(1)) : max( $ActiveTasks.GetSample(1), avg($ActiveTasks.GetSample(span)));
+ multiplier = 1;
+ $cores = $TargetDedicatedNodes;
+ $extraVMs = (($tasks - $cores) + 0) * multiplier;
+ $targetVMs = ($TargetDedicatedNodes + $extraVMs);
+ $TargetDedicatedNodes = max(0, min($targetVMs, 50));
+ $NodeDeallocationOption = taskcompletion;'
+
+
+```
+  
+
+### Get GitHub PAT token
+There is probably another way to set and retrieve a GitHub PAT within bash but this was the simplest way I found to get the token so I could supply it to a script programatically to avoid saving it in files that might accidentally get shared. 
+
+```{bash}
+ghpat=`Rscript -e "cat(gh::gh_token())"`
+```
+
+### Use `sed` to replace placeholder text in files
+sed is a command line tool that allows you to replace a placeholder in a text file with a value generated by your script for example using the sastoken created above:
+
+```{bash}
+sed 's,<sastoken>,'${sastoken//&/\\&}',g' cloud_config/template_task_with_file_in_out.json > cloud_config/task_to_use.json
+```
+
+This is important to avoid hard coding secret passwords or token in to your saved files. And you should remove the "to_use" file that contains the password when you are done (`rm cloud_config/task_to_use.json`). You can also add `*to_use*` to your .gitignore file to make sure they don't accidentally get added to GitHub.
+
+The syntax of sed is a bit tricky and is complicated by special characters in sastoken. In the command above the s indicates we want to use seds subsitiution command, the comma (,) is a delimiter that shows the start of the string to be replaced. "<sastoken>" is the text to be replaced (the <> doesn't have any special meaning it is just convention for placeholders). The second comma shows the start of the string to replace it with. The $ means that the part inside the {} will be evaluated first and then be part of the sed command. The `//&/\\&` will just add a `\` before all the & in the sastoken so they don't get interpreted as special characters by sed. The third comma shows the end of the text to replace with and the g indicates that every instance of the pattern should be replaced. Finally the first path is the template file containing the placeholder and the second is the path to the file to create. `/` is the default delimiter used in sed but it doesn't work if there are slashes in the replacement text so I have used commas instead. See the [sed documentation](https://tldp.org/LDP/abs/html/x23170.html) for more details and examples. 
+
+You can also use sed with a loop to create many different versions of a file:
+
+```{bash}
+for rowi in {1..27}
+do
+  sed 's,<SASURL>,'${sasurl//&/\\&}',g' analysis/cloud/task_roads.json\
+  | sed 's,<row>,'$rowi',g' > analysis/cloud/task_jsons/task_roads_$rowi.json
+done
+
+```
+
+The above first replaces `<SASURL>` in the file and then uses the pipe `|` to pass the result on to another sed command that replaces `<row>` with the loop index `rowi` and saves it to a file with the row appended. This can be helpful for creating many different versions of a task. 

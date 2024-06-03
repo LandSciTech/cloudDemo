@@ -1,10 +1,11 @@
-pandoc: 2.19.2
-pkgdown: 2.0.7
+pandoc: 3.1.11
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
+  cliCommands: cliCommands.html
   cloudSetup: cloudSetup.html
   parallelization: parallelization.html
-last_built: 2024-02-02T20:09Z
+last_built: 2024-06-03T14:41Z
 urls:
   reference: https://landscitech.github.io/cloudDemo/reference
   article: https://landscitech.github.io/cloudDemo/articles

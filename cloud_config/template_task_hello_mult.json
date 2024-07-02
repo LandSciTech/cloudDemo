@@ -1,6 +1,6 @@
 {
     "id": "sampleTask<taskid>",
-    "commandLine": "R -e 'print(<taskid>);mean(mtcars$mpg);Sys.sleep(200)'",
+    "commandLine": "R -e 'print(<taskid>);mean(mtcars$mpg);Sys.sleep(500)'",
 	"containerSettings": {
     "imageName": "rocker/r-bspm:jammy",
     "containerRunOptions": "--rm"

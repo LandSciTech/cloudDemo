@@ -230,25 +230,50 @@ az batch node list --pool-id $poolName --query "{nodes: [].[id, state][]}" --out
 ```
 
 ### Enable autoscaling
-Once a pool is running well and I am confident that results will be saved as expected I enable autoscaleing so that we will not be charged after the task is finished running. This will mean that the task is deleted after it completes so you won't be able to look at logs or files on it afterwards. 
-This formula is still a bit mysterious to me
-```{bash}
-# prompt auto scaleing of pool by changing time interval
-# enabling this as soon as the tasks are created seems to make it think there are no tasks
-az batch pool autoscale enable --pool-id $poolName --auto-scale-evaluation-interval "PT5M"\
- --auto-scale-formula 'percentage = 70;
- span = TimeInterval_Second * 15;
- $samples = $ActiveTasks.GetSamplePercent(span);
- $tasks = $samples < percentage ? max(0,$ActiveTasks.GetSample(1)) : max( $ActiveTasks.GetSample(1), avg($ActiveTasks.GetSample(span)));
- multiplier = 1;
- $cores = $TargetDedicatedNodes;
- $extraVMs = (($tasks - $cores) + 0) * multiplier;
- $targetVMs = ($TargetDedicatedNodes + $extraVMs);
- $TargetDedicatedNodes = max(0, min($targetVMs, 50));
- $NodeDeallocationOption = taskcompletion;'
+Once a pool is running well and I am confident that results will be saved as expected I enable autoscaling so that we will not be charged after the task is finished running. This will mean that the task is deleted after it completes so you won't be able to look at logs or files on it afterwards. 
+One confusing aspect of autoscaling is that it doesn't happen immediately the interval set below is the shortest available and means it will run every 5 minutes. So generally if it seems like it is not working, wait 5 mins and check again.
+The formula below is hard to read, there is documentation available [here](https://learn.microsoft.com/en-us/azure/batch/batch-automatic-scaling) and I will try to explain the logic of this example. First I have set max VMs to 25 since our account has a max of 27, you may want to set this lower if others are using the account at the same time. Next I find out how many tasks are currently waiting ("active tasks") and how many are currently running. Unfortunately this is not a simple number because these values are not exactly accurate in real time, they are recorded every 30s and sometimes that process fails so the value is missing. Therefore the recommendation is to use a sampling of values, in this case I have chosen the last 2 minutes which returns a vector of values recorded over the last 2 minutes. I take the max of these values and add the current and active tasks together to get the total number of tasks that I want to run. Then I determine the number of nodes that are currently available. I use the max of current and target nodes so that it will not think there are 0 nodes if the pool is still starting up or if the target was 0 but new tasks have been added. Next I determine the total number of tasks that can run at a time (called cores below). Then I calculate the number of additional nodes that are needed given the total number of tasks minus the existing number of cores and the number of task slots per node. Then we set the target dedicated nodes making sure it is between 0 and 25. Finally, I set the node deallocation option so that all the tasks running on the node must finish before it is shutdown. 
 
+```{bash}
+# you can prompt autoscaling of pool by changing time interval
+az batch pool autoscale enable --pool-id $poolName --auto-scale-evaluation-interval "PT5M"\
+ --auto-scale-formula 'maxNumberofVMs = 25;
+ $atasks = $ActiveTasks.GetSample(TimeInterval_Minute * 2, 1);
+ $rtasks = $RunningTasks.GetSample(TimeInterval_Minute * 2, 1);
+ $tasks = max($atasks) + max($rtasks);
+ $nodes = max($CurrentDedicatedNodes, $TargetDedicatedNodes);
+ $cores = $nodes*$TaskSlotsPerNode;
+ $extraVMs = ceil((($tasks - $cores) + 0) / $TaskSlotsPerNode);
+ $targetVMs = ($nodes + $extraVMs);
+ $TargetDedicatedNodes = max(0, min($targetVMs, maxNumberofVMs));
+ $NodeDeallocationOption = taskcompletion;' 
+```
+
+Although autoscaling only runs every 5 minutes you can check what the result would be by evaluating the autoscaling formula. This only works after autoscaling has been enabled. 
+
+```{bash}
+# This will show what the formula would return if autoscaling ran now.  
+az batch pool autoscale evaluate --pool-id $poolName \
+--auto-scale-formula 'maxNumberofVMs = 25;
+ $atasks = $ActiveTasks.GetSample(TimeInterval_Minute * 2, 1);
+ $rtasks = $RunningTasks.GetSample(TimeInterval_Minute * 2, 1);
+ $tasks = max($atasks) + max($rtasks);
+ $nodes = max($CurrentDedicatedNodes, $TargetDedicatedNodes);
+ $cores = $nodes*$TaskSlotsPerNode;
+ $extraVMs = ceil((($tasks - $cores) + 0) / $TaskSlotsPerNode);
+ $targetVMs = ($nodes + $extraVMs);
+ $TargetDedicatedNodes = max(0, min($targetVMs, maxNumberofVMs));
+ $NodeDeallocationOption = taskcompletion;' 
 
 ```
+
+If autoscaling is not working as desired or you want to change the formula you can disable autoscaling and manually set the number of nodes needed. But make sure to turn autoscaling back on once all the tasks have started to ensure the pool will not keep running after all tasks are complete. 
+
+```{bash}
+az batch pool autoscale disable --pool-id $poolName
+az batch pool resize --pool-id $poolName --target-dedicated-nodes 12
+```
+
   
 
 ### Get GitHub PAT token

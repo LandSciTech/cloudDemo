@@ -2,7 +2,7 @@
 	"type": "Microsoft.Batch/batchAccounts/pools",
 	"apiVersion": "2016-12-01",
 	"id": "test_pool_json_cli",
-	"vmSize": "standard_A1_v2",
+	"vmSize": "standard_A2_v2",
 	"virtualMachineConfiguration": {
 		"imageReference": {
 			"publisher": "microsoft-azure-batch",
@@ -22,6 +22,7 @@
 		}
 	},
 		"targetDedicatedNodes": 1,
+		"taskSlotsPerNode": 2,
 	"networkConfiguration": {
 		"subnetId":"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"
 		}

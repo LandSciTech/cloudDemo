@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Monitor CPU usage and available memory on Azure
+
 az login
 
 az batch account login -g EcDc-WLS-rg -n ecdcwlsbatch
@@ -21,7 +23,7 @@ sed 's,<sastoken>,'${sastoken//&/\\&}',g' cloud_config/template_task_monitor.jso
 poolName=test_pool_json_cli
 jobName=test_job
 
-# We create the pool which will start with 1 target dedicated node
+# Create the pool with 2 task slots per node
 az batch pool create --json-file cloud_config/template_pool_cli.json
 az batch job create --pool-id test_pool_json_cli --id $jobName
 
@@ -32,7 +34,9 @@ state:state, enableAutoScale:enableAutoScale,
 allocState:allocationState, lastModified:lastModified}" \
 --output table
 
+# Run a task that does something memory intensive
 az batch task create --json-file cloud_config/task_test_monitor.json --job-id test_job
+# And in the other slot on the same node run a task that monitors usage
 az batch task create --json-file cloud_config/task_to_use.json --job-id test_job
 
 az batch job task-counts show --job-id test_job
@@ -46,13 +50,14 @@ az batch task file download --task-id test_outFile --job-id $jobName \
 --file-path $fileName --destination "cloud_config/$fileName"
 
 # print the file to console
-# cat "cloud_config/$fileName"
+cat "cloud_config/$fileName"
 
 Rscript -e 'library(tidyverse);read.table("cloud_config/stdout.txt", sep = ":", col.names = c("var", "value")) %>% mutate(var = str_remove(var, "^\\\\r"), value = str_remove_all(value, "\\\\") %>% str_remove("bb|GB  bb")) %>% filter(var == "MEM") %>% ggplot(aes(1:nrow(.), as.numeric(value)))+geom_point()+labs(y = "Available memory (GB)");ggsave("test.png")'
 
 open test.png
 
 rm test.png
+rm cloud_config/task_to_use.json
 
 az batch pool delete --pool-id $poolName -y
 az batch job delete --job-id test_job -y

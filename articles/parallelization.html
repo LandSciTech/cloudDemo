@@ -78,18 +78,19 @@ model on a separate core. Because this example is so simple I have added
 a delay in the function so we can see the benefit of running in
 parallel. There are many ways to do this and I will explain a few
 options. One option is to create a parallel backend in R using something
-like the future package. This can be quite straight forward and there
-are packages to connect this familiar methods of iterating (eg for
-loops, lapply or purrr). This can get a bit tricky in that you are
-typically running only parts of the script on multiple cores you need to
-make sure the right dependencies are available on the workers. future
-manages this for the most part but see <a href="https://future.futureverse.org/articles/future-4-issues.html" class="external-link uri">https://future.futureverse.org/articles/future-4-issues.html</a>
+like the <code>future</code> package. This can be quite straight forward
+and there are packages to connect this with familiar methods of
+iterating (eg for loops, <code>lapply</code> or
+<code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map</a></code>). This can get a bit tricky in that you are
+typically running only parts of the script on multiple cores and you
+need to make sure the right dependencies are available on the workers.
+<code>future</code> manages this for the most part but see <a href="https://future.futureverse.org/articles/future-4-issues.html" class="external-link uri">https://future.futureverse.org/articles/future-4-issues.html</a>
 for tips when that fails.</p>
 <div class="section level3">
 <h3 id="using-the-future-and-furrr-packages">Using the future and furrr packages<a class="anchor" aria-label="anchor" href="#using-the-future-and-furrr-packages"></a>
 </h3>
-<p>The future package sets up the infrastructure needed to run things in
-the background. To initialize this you run
+<p><code>future</code> sets up the infrastructure needed to run things
+in the background. To initialize this you run
 <code>future::plan("multisession")</code> which will use all
 <code>future::availableCores()</code> by default. See script
 “analyses/02_run_model_furrr.R” for an example.</p>
@@ -98,8 +99,9 @@ the background. To initialize this you run
 <h3 id="using-future-and-foreach">Using future and foreach<a class="anchor" aria-label="anchor" href="#using-future-and-foreach"></a>
 </h3>
 <p>If you usually use for loops then the foreach package might be easier
-to use. This can be used with future to create the backend using the
-doFuture package.</p>
+to use. This can be used with <code>future</code> to create the backend
+using the <code>doFuture</code> package. See script
+“analyses/03_run_model_foreach.R” for an example.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

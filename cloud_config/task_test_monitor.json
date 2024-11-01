@@ -1,0 +1,14 @@
+{
+    "id": "sampleTask",
+    "commandLine": "R -e 'df_out <- data.frame(rn = rnorm(10));for(i in 1:1000){df_out <- rbind(df_out, data.frame(rn = rnorm(10000, i)))}'",
+	"containerSettings": {
+    "imageName": "rocker/r-bspm:jammy",
+    "containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "nonadmin"
+        }
+    }
+}

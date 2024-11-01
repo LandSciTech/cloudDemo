@@ -1,0 +1,32 @@
+{
+  "id": "test_outFile",
+  "commandLine": "bash analyses/scripts/monitor_cpu.sh",
+  "resourceFiles": [{
+		"autoStorageContainerName": "sendicott"
+	}
+	],
+  "outputFiles": [
+	{
+    "destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
+				"path": "logs"
+			}
+		},
+		"filePattern": "../std*.txt",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	}
+	],
+	"containerSettings": {
+		"imageName": "rocker/r-ubuntu:jammy",
+		"containerRunOptions": "--rm"
+	},
+    "userIdentity": {
+        "autoUser": {
+            "scope": "task",
+            "elevationLevel": "admin"
+        }
+    }
+}

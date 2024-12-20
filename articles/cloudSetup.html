@@ -471,6 +471,15 @@ az batch pool list --query "[].{id:id, state:state}"</code></pre>
 </div>
 </div>
 <div class="section level2">
+<h2 id="run-tasks-in-parallel">Run tasks in parallel<a class="anchor" aria-label="anchor" href="#run-tasks-in-parallel"></a>
+</h2>
+<p>To truly take advantage of the cloud we may want to run multiple
+tasks at once across multiple cores on one node or multiple nodes in a
+pool. See
+<code>vignette("Parallelization", package = "cloudDemo")</code> for
+examples of how to do this and use autoscaling.</p>
+</div>
+<div class="section level2">
 <h2 id="install-azcopy-if-needed">Install AzCopy if needed<a class="anchor" aria-label="anchor" href="#install-azcopy-if-needed"></a>
 </h2>
 <p>AzCopy is another command line tool that is used by the az storage

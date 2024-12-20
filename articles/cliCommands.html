@@ -284,11 +284,12 @@ that it is working and then resize to the desired number of nodes.</p>
 saved as expected I enable autoscaling so that we will not be charged
 after the task is finished running. This will mean that the task is
 deleted after it completes so you won’t be able to look at logs or files
-on it afterwards. One confusing aspect of autoscaling is that it doesn’t
-happen immediately the interval set below is the shortest available and
-means it will run every 5 minutes. So generally if it seems like it is
-not working, wait 5 mins and check again. The formula below is hard to
-read, there is documentation available <a href="https://learn.microsoft.com/en-us/azure/batch/batch-automatic-scaling" class="external-link">here</a>
+on it afterwards. See an example autoscaling workflow <a href="https://github.com/LandSciTech/cloudDemo/blob/master/analyses/scripts/run_azure_autoscale.sh" class="external-link">here</a>
+One confusing aspect of autoscaling is that it doesn’t happen
+immediately the interval set below is the shortest available and means
+it will run every 5 minutes. So generally if it seems like it is not
+working, wait 5 mins and check again. The formula below is hard to read,
+there is documentation available <a href="https://learn.microsoft.com/en-us/azure/batch/batch-automatic-scaling" class="external-link">here</a>
 and I will try to explain the logic of this example. First I have set
 max VMs to 25 since our account has a max of 27, you may want to set
 this lower if others are using the account at the same time. Next I find
@@ -345,6 +346,15 @@ have started to ensure the pool will not keep running after all tasks
 are complete.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="ex">az</span> batch pool autoscale disable <span class="at">--pool-id</span> <span class="va">$poolName</span></span>
 <span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="ex">az</span> batch pool resize <span class="at">--pool-id</span> <span class="va">$poolName</span> <span class="at">--target-dedicated-nodes</span> 12</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="monitor-cpu-usage-and-memory">Monitor CPU usage and memory<a class="anchor" aria-label="anchor" href="#monitor-cpu-usage-and-memory"></a>
+</h3>
+<p>To check the CPU usage and memory usage on a node we can run an
+additional task on the same node by setting multiple taskSlotsPerNode.
+Follow <a href="https://github.com/LandSciTech/cloudDemo/blob/master/analyses/scripts/run_azure_monitor.sh" class="external-link">this
+script</a> to set up a monitoring task and produce a graph of memory
+usage based on the values returned.</p>
 </div>
 <div class="section level3">
 <h3 id="get-github-pat-token">Get GitHub PAT token<a class="anchor" aria-label="anchor" href="#get-github-pat-token"></a>

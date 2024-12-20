@@ -230,7 +230,7 @@ az batch node list --pool-id $poolName --query "{nodes: [].[id, state][]}" --out
 ```
 
 ### Enable autoscaling
-Once a pool is running well and I am confident that results will be saved as expected I enable autoscaling so that we will not be charged after the task is finished running. This will mean that the task is deleted after it completes so you won't be able to look at logs or files on it afterwards. 
+Once a pool is running well and I am confident that results will be saved as expected I enable autoscaling so that we will not be charged after the task is finished running. This will mean that the task is deleted after it completes so you won't be able to look at logs or files on it afterwards. See an example autoscaling workflow [here](https://github.com/LandSciTech/cloudDemo/blob/master/analyses/scripts/run_azure_autoscale.sh)
 One confusing aspect of autoscaling is that it doesn't happen immediately the interval set below is the shortest available and means it will run every 5 minutes. So generally if it seems like it is not working, wait 5 mins and check again.
 The formula below is hard to read, there is documentation available [here](https://learn.microsoft.com/en-us/azure/batch/batch-automatic-scaling) and I will try to explain the logic of this example. First I have set max VMs to 25 since our account has a max of 27, you may want to set this lower if others are using the account at the same time. Next I find out how many tasks are currently waiting ("active tasks") and how many are currently running. Unfortunately this is not a simple number because these values are not exactly accurate in real time, they are recorded every 30s and sometimes that process fails so the value is missing. Therefore the recommendation is to use a sampling of values, in this case I have chosen the last 2 minutes which returns a vector of values recorded over the last 2 minutes. I take the max of these values and add the current and active tasks together to get the total number of tasks that I want to run. Then I determine the number of nodes that are currently available. I use the max of current and target nodes so that it will not think there are 0 nodes if the pool is still starting up or if the target was 0 but new tasks have been added. Next I determine the total number of tasks that can run at a time (called cores below). Then I calculate the number of additional nodes that are needed given the total number of tasks minus the existing number of cores and the number of task slots per node. Then we set the target dedicated nodes making sure it is between 0 and 25. Finally, I set the node deallocation option so that all the tasks running on the node must finish before it is shutdown. 
 
@@ -274,7 +274,9 @@ az batch pool autoscale disable --pool-id $poolName
 az batch pool resize --pool-id $poolName --target-dedicated-nodes 12
 ```
 
-  
+### Monitor CPU usage and memory
+
+To check the CPU usage and memory usage on a node we can run an additional task on the same node by setting multiple taskSlotsPerNode. Follow [this script](https://github.com/LandSciTech/cloudDemo/blob/master/analyses/scripts/run_azure_monitor.sh) to set up a monitoring task and produce a graph of memory usage based on the values returned. 
 
 ### Get GitHub PAT token
 There is probably another way to set and retrieve a GitHub PAT within bash but this was the simplest way I found to get the token so I could supply it to a script programatically to avoid saving it in files that might accidentally get shared. 

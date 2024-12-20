@@ -302,6 +302,9 @@ az batch pool delete --pool-id test_pool_json_cli
 az batch job list --query "[].{id:id, state:state}"
 az batch pool list --query "[].{id:id, state:state}"
 ```
+## Run tasks in parallel
+
+To truly take advantage of the cloud we may want to run multiple tasks at once across multiple cores on one node or multiple nodes in a pool. See `vignette("Parallelization", package = "cloudDemo")` for examples of how to do this and use autoscaling. 
 
 ## Install AzCopy if needed
 

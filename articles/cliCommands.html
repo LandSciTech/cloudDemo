@@ -8,8 +8,8 @@
 <title>Useful Azure CLI commands • cloudDemo</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Useful Azure CLI commands">
 </head>
 <body>
@@ -43,7 +43,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/see24/cloudDemo/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/LandSciTech/cloudDemo/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,7 +60,7 @@
       <h1>Useful Azure CLI commands</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/see24/cloudDemo/blob/master/vignettes/cliCommands.Rmd" class="external-link"><code>vignettes/cliCommands.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/LandSciTech/cloudDemo/blob/master/vignettes/cliCommands.Rmd" class="external-link"><code>vignettes/cliCommands.Rmd</code></a></small>
       <div class="d-none name"><code>cliCommands.Rmd</code></div>
     </div>
 
@@ -371,8 +371,8 @@ accidentally get added to GitHub.</p>
 <p>The syntax of sed is a bit tricky and is complicated by special
 characters in sastoken. In the command above the s indicates we want to
 use seds subsitiution command, the comma (,) is a delimiter that shows
-the start of the string to be replaced. “<sastoken>” is the text to be
-replaced (the &lt;&gt; doesn’t have any special meaning it is just
+the start of the string to be replaced. “&lt;sastoken&gt;” is the text
+to be replaced (the &lt;&gt; doesn’t have any special meaning it is just
 convention for placeholders). The second comma shows the start of the
 string to replace it with. The $ means that the part inside the {} will
 be evaluated first and then be part of the sed command. The
@@ -385,7 +385,7 @@ placeholder and the second is the path to the file to create.
 <code>/</code> is the default delimiter used in sed but it doesn’t work
 if there are slashes in the replacement text so I have used commas
 instead. See the <a href="https://tldp.org/LDP/abs/html/x23170.html" class="external-link">sed
-documentation</a> for more details and examples.</sastoken></p>
+documentation</a> for more details and examples.</p>
 <p>You can also use sed with a loop to create many different versions of
 a file:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="cf">for</span> rowi <span class="kw">in</span> <span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">27</span><span class="dt">}</span></span>

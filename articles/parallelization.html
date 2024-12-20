@@ -8,8 +8,8 @@
 <title>Parallelization • cloudDemo</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Parallelization">
 </head>
 <body>
@@ -43,7 +43,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/see24/cloudDemo/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/LandSciTech/cloudDemo/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,14 +60,16 @@
       <h1>Parallelization</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/see24/cloudDemo/blob/master/vignettes/parallelization.Rmd" class="external-link"><code>vignettes/parallelization.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/LandSciTech/cloudDemo/blob/master/vignettes/parallelization.Rmd" class="external-link"><code>vignettes/parallelization.Rmd</code></a></small>
       <div class="d-none name"><code>parallelization.Rmd</code></div>
     </div>
 
     
     
-<p>This tutorial explains different methods for using the cloud to run
-an analysis in parallel.</p>
+<p>This tutorial explains different methods to run an analysis in
+parallel that are helpful when working on the cloud. All the scripts
+referenced below can be found in the <a href="https://github.com/LandSciTech/cloudDemo/tree/master/analyses/scripts" class="external-link">cloudDemo
+GitHub</a></p>
 <div class="section level2">
 <h2 id="running-the-analysis-in-parallel">Running the analysis in parallel<a class="anchor" aria-label="anchor" href="#running-the-analysis-in-parallel"></a>
 </h2>
@@ -92,7 +94,9 @@ for tips when that fails.</p>
 <p><code>future</code> sets up the infrastructure needed to run things
 in the background. To initialize this you run
 <code>future::plan("multisession")</code> which will use all
-<code>future::availableCores()</code> by default. See script
+<code>future::availableCores()</code> by default. <code>furrr</code> is
+a parallelized version of <code>purrr</code> which allows you to iterate
+over elements in a list on separate cores. See script
 “analyses/02_run_model_furrr.R” for an example.</p>
 </div>
 <div class="section level3">
@@ -101,8 +105,46 @@ in the background. To initialize this you run
 <p>If you usually use for loops then the foreach package might be easier
 to use. This can be used with <code>future</code> to create the backend
 using the <code>doFuture</code> package. See script
-“analyses/03_run_model_foreach.R” for an example.</p>
+“analyses/scripts/03_run_model_foreach.R” for an example.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="running-the-tasks-in-parallel-on-multiple-virtual-machines">Running the tasks in parallel on multiple virtual machines<a class="anchor" aria-label="anchor" href="#running-the-tasks-in-parallel-on-multiple-virtual-machines"></a>
+</h2>
+<p>Instead of setting up a script to run in parallel on one machine we
+can split the job into multiple tasks that can run independently on
+separate machines. This is useful because each task will be contained in
+a separate process so if one iteration fails it will not impact the
+rest. The downside is that the whole script must be run in each task and
+each node will have to be set up with dependencies installed
+separately.</p>
+<p>To set this up we need to pass an argument to the R script that the
+task will run to tell it which iteration to run. The bash command to run
+one iteration would look like:</p>
+<pre><code>Rscript analyses/scripts/04_run_model_multitask.R 1</code></pre>
+<p>And in the R script “analyses/scripts/04_run_model_multitask.R”
+<code>commandArgs(trailingOnly = TRUE)</code> is used to access the
+number passed to the script (eg. 1). The number is then used to select
+the variable to test and to name the output of the task in a unique way.
+The output of each task is saved and downloaded so that we can compile
+the results and create our figure.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span></span>
+<span><span class="va">r2_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analyses/data/derived-data"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"*.csv"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="va">read.csv</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">variable</span>, <span class="va">r.squared</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
+<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span>
+<span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">r2_tab</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">variable</span>, <span class="va">r.squared</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="parallelization_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p>For an example of how to run this whole analysis from the command
+line see “analyses/scripts/run_azure_autoscale.sh” which also serves as
+an example of setting up autoscaling. Autoscaling automatically
+increases or decreases the number of nodes in a pool depending on how
+many tasks are waiting to start and how many are completed.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

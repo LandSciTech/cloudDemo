@@ -1,3 +1,5 @@
+library(cloudDemo)
+library(ggplot2)
 
 future::plan("multisession")
 tictoc::tic()
@@ -7,8 +9,6 @@ r2_tab <- furrr::future_map_dfr(names(mtcars)[-1], do_mod) |>
 
 ggplot(r2_tab, aes(variable, r.squared))+
   geom_col()
-
-ggsave("figures/r2_mpg_variables.png")
 
 tictoc::toc()
 

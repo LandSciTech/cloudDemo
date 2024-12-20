@@ -1,14 +1,43 @@
 {
     "id": "sampleTask<taskid>",
-    "commandLine": "R -e 'print(<taskid>);mean(mtcars$mpg);Sys.sleep(500)'",
+    "commandLine": "Rscript analyses/scripts/04_run_model_multitask.R <taskid>",
+  "resourceFiles": [{
+		"autoStorageContainerName": "sendicott"
+	}
+	],
+  "outputFiles": [
+	{
+    "destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>",
+				"path": "logs"
+			}
+		},
+		"filePattern": "../std*.txt",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	},
+	{
+		"destination": {
+			"container": {
+				"containerUrl": "https://ecdcwls.blob.core.windows.net/sendicott/?<sastoken>"
+			}
+		},
+		"filePattern": "*.csv",
+		"uploadOptions": {
+			"uploadCondition": "taskcompletion"
+		}
+	}
+	],
 	"containerSettings": {
-    "imageName": "rocker/r-bspm:jammy",
-    "containerRunOptions": "--rm"
+		"imageName": "rocker/r-ubuntu:jammy",
+		"containerRunOptions": "--rm"
 	},
     "userIdentity": {
         "autoUser": {
             "scope": "task",
-            "elevationLevel": "nonadmin"
+            "elevationLevel": "admin"
         }
     }
 }

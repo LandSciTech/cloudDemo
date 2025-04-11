@@ -95,4 +95,5 @@ az batch pool delete --pool-id $poolName -y
 az batch job delete --job-id test_job -y
 
 # delete directory and files with task specific jsons that contain token
-rm -r cloud_config/task_jsons
+rm -r cloud_config/task_to_use.json
+

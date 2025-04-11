@@ -13,9 +13,10 @@ sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end
 
 sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken
 
-az storage copy -d $sasurl -s analyses --recursive
-
+# show files in container. All these files will be copied to each node
 az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken --query "[].{name:name}"
+
+az storage copy -d $sasurl -s analyses --recursive
 
 sed 's,<sastoken>,'${sastoken//&/\\&}',g' cloud_config/template_task_monitor.json > cloud_config/task_to_use.json
 
@@ -62,3 +63,5 @@ rm cloud_config/task_to_use.json
 az batch pool delete --pool-id $poolName -y
 az batch job delete --job-id test_job -y
 
+# remove all files in container
+az storage remove -c sendicott --account-name ecdcwls --sas-token $sastoken --recursive

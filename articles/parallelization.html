@@ -122,11 +122,6 @@ separately.</p>
 task will run to tell it which iteration to run. The bash command to run
 one iteration would look like:</p>
 <pre><code>Rscript analyses/scripts/04_run_model_multitask.R 1
-
-for rowi in {1..10}
-do
- Rscript analyses/scripts/04_run_model_multitask.R $rowi
-done
 </code></pre>
 <p>And in the R script “analyses/scripts/04_run_model_multitask.R”
 <code>commandArgs(trailingOnly = TRUE)</code> is used to access the

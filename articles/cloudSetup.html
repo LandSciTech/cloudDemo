@@ -147,30 +147,33 @@ on the type of pool you want to build.</p>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Microsoft.Batch/batchAccounts/pools"</span><span class="fu">,</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="dt">"apiVersion"</span><span class="fu">:</span> <span class="st">"2016-12-01"</span><span class="fu">,</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"test_pool_json_cli"</span><span class="fu">,</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="dt">"vmSize"</span><span class="fu">:</span> <span class="st">"standard_A1_v2"</span><span class="fu">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="dt">"vmSize"</span><span class="fu">:</span> <span class="st">"standard_DS2_v2"</span><span class="fu">,</span></span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    <span class="dt">"virtualMachineConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>        <span class="dt">"imageReference"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>            <span class="dt">"publisher"</span><span class="fu">:</span> <span class="st">"microsoft-azure-batch"</span><span class="fu">,</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>            <span class="dt">"offer"</span><span class="fu">:</span> <span class="st">"ubuntu-server-container"</span><span class="fu">,</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>            <span class="dt">"sku"</span><span class="fu">:</span> <span class="st">"20-04-lts"</span><span class="fu">,</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>            <span class="dt">"version"</span><span class="fu">:</span> <span class="st">"latest"</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>        <span class="dt">"nodeAgentSKUId"</span><span class="fu">:</span> <span class="st">"batch.node.ubuntu 20.04"</span><span class="fu">,</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>        <span class="dt">"containerConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>          <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"dockerCompatible"</span><span class="fu">,</span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>          <span class="dt">"containerImageNames"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>            <span class="st">"rocker/r-bspm:jammy"</span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>          <span class="ot">]</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>        <span class="dt">"nodePlacementConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>          <span class="dt">"policy"</span><span class="fu">:</span> <span class="st">"regional"</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>    <span class="fu">},</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>        <span class="dt">"targetDedicatedNodes"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>    <span class="dt">"networkConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>        <span class="dt">"subnetId"</span><span class="fu">:</span><span class="st">"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>            <span class="dt">"publisher"</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>            <span class="dt">"offer"</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>            <span class="dt">"sku"</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>            <span class="dt">"version"</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>            <span class="dt">"virtualMachineImageId"</span><span class="fu">:</span> <span class="st">"/subscriptions/b215566c-fe84-4c8f-a24c-99de0b444b13/resourceGroups/EcPc-SharedImageGallery-rg/providers/Microsoft.Compute/galleries/EcPcSharedImageGallery/images/Ubuntu2404WithDocker/versions/1.0.0"</span><span class="fu">,</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>            <span class="dt">"exactVersion"</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>        <span class="dt">"nodeAgentSKUId"</span><span class="fu">:</span> <span class="st">"batch.node.ubuntu 24.04"</span><span class="fu">,</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>        <span class="dt">"licenseType"</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>        <span class="dt">"containerConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"dockerCompatible"</span><span class="fu">,</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>            <span class="dt">"containerImageNames"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>                <span class="st">"rocker/r-bspm:jammy"</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>            <span class="ot">]</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>        <span class="dt">"nodePlacementConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>            <span class="dt">"policy"</span><span class="fu">:</span> <span class="st">"regional"</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>        <span class="dt">"targetDedicatedNodes"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>    <span class="dt">"networkConfiguration"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>        <span class="dt">"subnetId"</span><span class="fu">:</span><span class="st">"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="fields-to-edit">Fields to edit:<a class="anchor" aria-label="anchor" href="#fields-to-edit"></a>
 </h4>
@@ -178,7 +181,7 @@ on the type of pool you want to build.</p>
 <li>id: Give the pool a name. It should start with the first letter of
 your first name and your last name so we can differentiate them to track
 billing eg “sendicott_test_pool”</li>
-<li>vmSize: This is the family of VM and the number of CPUs different
+<li>vmSize: This is the family of VM and the number of CPUs, different
 families will have different # CPU to RAM ratios. We have access to a
 subset of VM families with a <a href="https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountQuotas" class="external-link">quota</a>
 for each one. See this <a href="https://learn.microsoft.com/en-us/azure/virtual-machines/sizes" class="external-link">Microsoft
@@ -187,7 +190,7 @@ to filter the options and choose a size is to go to the Azure portal
 &gt; Batch &gt; <a href="https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountPools" class="external-link">Pools
 page</a> and click “Add” and then scroll to vmSize and follow the link
 for “View full pricing details”. In this example we use
-“Standard_A1_v2”. All the names start with “Standard_” and then you
+“Standard_DS2_v2”. All the names start with “Standard_” and then you
 substitute the sku which contains the Family, # CPUs and version.</li>
 <li>targetDedicatedNodes: The number of nodes to have in the pool.
 Typically 1 if you are going to run one task that might use multiple
@@ -198,10 +201,9 @@ use. This will pre-fetch this docker image for use with your tasks. You
 can enter the name of any <a href="https://hub.docker.com/" class="external-link">DockerHub</a> image. For R users see the
 <a href="https://rocker-project.org/images/versioned/rstudio.html" class="external-link">rocker
 project</a> for some good options. The one used in the example file is
-“rocker/r-bspm:jammy” which has is based on ubuntu jammy and has R
-installed and set up to use the bspm package so that R packages can be
-installed on linux from binary using <code>install.packages</code> as
-usual.</li>
+“rocker/r-bspm:jammy” which is based on ubuntu jammy and has R installed
+and set up to use the bspm package so that R packages can be installed
+on linux from binary using <code>install.packages</code> as usual.</li>
 </ul>
 </div>
 <div class="section level4">
@@ -210,15 +212,17 @@ usual.</li>
 <ul>
 <li>imageReference: I have provided two pool template JSON files, one
 for windows and one for linux so you can just use one of those unless
-you have another reason to customize. (TODO: windows version did not
-work with example) This is basically the operating system that you want
-to use. You can choose from windows or linux options, but if you want to
-use docker you need to choose one that is docker compatible. To do this
-you can run
+you have another reason to customize. This is basically the operating
+system that you want to use. You can choose from windows or linux
+options, but if you want to use docker you need to choose one that is
+docker compatible. To do this you can run
 <code>az batch pool supported-images list --filter "osType eq 'linux'"|tee test_linux.txt</code>
 this lists the supported images for the linux osType, change to
 ‘windows’ to see windows options, and outputs the result to a text file.
-I then searched the text file for “dockerCompatible”</li>
+I then searched the text file for “dockerCompatible”. Azure is no longer
+making dockerCompatible images so current image used in the template was
+created by CCOE and is provided in a Shared Image Gallery. It is just
+Ubuntu with Docker installed.</li>
 </ul>
 <p>Once you are happy with the JSON file you can create your pool by
 running
@@ -357,7 +361,7 @@ sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end
 
 sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken</code></pre>
 <p>Then copy all files from a local directory to the container url
-created above then list the filenames in the container.</p>
+created above and list the filenames in the container.</p>
 <pre><code>az storage copy -d $sasurl -s analyses --recursive
 
 az storage blob list -c sendicott --account-name ecdcwls --sas-token $sastoken --query "[].{name:name}"</code></pre>

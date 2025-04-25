@@ -34,11 +34,6 @@ To set this up we need to pass an argument to the R script that the task will ru
 ```
 Rscript analyses/scripts/04_run_model_multitask.R 1
 
-for rowi in {1..10}
-do
- Rscript analyses/scripts/04_run_model_multitask.R $rowi
-done
-
 ```
 And in the R script "analyses/scripts/04_run_model_multitask.R" `commandArgs(trailingOnly = TRUE)` is used to access the number passed to the script (eg. 1). The number is then used to select the variable to test and to name the output of the task in a unique way. The output of each task is saved and downloaded so that we can compile the results and create our figure.
 

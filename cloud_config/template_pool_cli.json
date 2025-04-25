@@ -2,25 +2,28 @@
 	"type": "Microsoft.Batch/batchAccounts/pools",
 	"apiVersion": "2016-12-01",
 	"id": "test_pool_json_cli",
-	"vmSize": "standard_A2_v2",
+	"vmSize": "standard_DS2_v2",
 	"virtualMachineConfiguration": {
-		"imageReference": {
-			"publisher": "microsoft-azure-batch",
-			"offer": "ubuntu-server-container",
-			"sku": "20-04-lts",
-			"version": "latest"
-		},
-		"nodeAgentSKUId": "batch.node.ubuntu 20.04",
-		"containerConfiguration": {
-		  "type": "dockerCompatible",
-		  "containerImageNames": [
-			"rocker/r-bspm:jammy"
-		  ]
-		},
-		"nodePlacementConfiguration": {
-		  "policy": "regional"
-		}
-	},
+        "imageReference": {
+            "publisher": null,
+            "offer": null,
+            "sku": null,
+            "version": null,
+            "virtualMachineImageId": "/subscriptions/b215566c-fe84-4c8f-a24c-99de0b444b13/resourceGroups/EcPc-SharedImageGallery-rg/providers/Microsoft.Compute/galleries/EcPcSharedImageGallery/images/Ubuntu2404WithDocker/versions/1.0.0",
+            "exactVersion": null
+        },
+        "nodeAgentSKUId": "batch.node.ubuntu 24.04",
+        "licenseType": null,
+        "containerConfiguration": {
+            "type": "dockerCompatible",
+            "containerImageNames": [
+                "rocker/r-bspm:jammy"
+            ]
+        },
+        "nodePlacementConfiguration": {
+            "policy": "regional"
+        }
+    },
 		"targetDedicatedNodes": 1,
 		"taskSlotsPerNode": 2,
 	"networkConfiguration": {

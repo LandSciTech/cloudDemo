@@ -49,25 +49,28 @@ A template JSON file is provided in this repository under cloud_config/template_
 	"type": "Microsoft.Batch/batchAccounts/pools",
 	"apiVersion": "2016-12-01",
 	"id": "test_pool_json_cli",
-	"vmSize": "standard_A1_v2",
+	"vmSize": "standard_DS2_v2",
 	"virtualMachineConfiguration": {
-		"imageReference": {
-			"publisher": "microsoft-azure-batch",
-			"offer": "ubuntu-server-container",
-			"sku": "20-04-lts",
-			"version": "latest"
-		},
-		"nodeAgentSKUId": "batch.node.ubuntu 20.04",
-		"containerConfiguration": {
-		  "type": "dockerCompatible",
-		  "containerImageNames": [
-			"rocker/r-bspm:jammy"
-		  ]
-		},
-		"nodePlacementConfiguration": {
-		  "policy": "regional"
-		}
-	},
+        "imageReference": {
+            "publisher": null,
+            "offer": null,
+            "sku": null,
+            "version": null,
+            "virtualMachineImageId": "/subscriptions/b215566c-fe84-4c8f-a24c-99de0b444b13/resourceGroups/EcPc-SharedImageGallery-rg/providers/Microsoft.Compute/galleries/EcPcSharedImageGallery/images/Ubuntu2404WithDocker/versions/1.0.0",
+            "exactVersion": null
+        },
+        "nodeAgentSKUId": "batch.node.ubuntu 24.04",
+        "licenseType": null,
+        "containerConfiguration": {
+            "type": "dockerCompatible",
+            "containerImageNames": [
+                "rocker/r-bspm:jammy"
+            ]
+        },
+        "nodePlacementConfiguration": {
+            "policy": "regional"
+        }
+    },
 		"targetDedicatedNodes": 1,
 	"networkConfiguration": {
 		"subnetId":"/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Network/virtualNetworks/EcDc-WLS-vnet/subnets/EcDc-WLS_compute-cluster-snet"
@@ -79,13 +82,13 @@ A template JSON file is provided in this repository under cloud_config/template_
 #### Fields to edit:
 
 - id: Give the pool a name. It should start with the first letter of your first name and your last name so we can differentiate them to track billing eg "sendicott_test_pool"
-- vmSize: This is the family of VM and the number of CPUs different families will have different # CPU to RAM ratios. We have access to a subset of VM families with a [quota](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountQuotas) for each one. See this [Microsoft website](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes) for some details on the different families. The easiest way to filter the options and choose a size is to go to the Azure portal > Batch > [Pools page](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountPools) and click "Add" and then scroll to  vmSize and follow the link for "View full pricing details". In this example we use "Standard_A1_v2". All the names start with "Standard_" and then you substitute the sku which contains the Family, # CPUs and version. 
+- vmSize: This is the family of VM and the number of CPUs, different families will have different # CPU to RAM ratios. We have access to a subset of VM families with a [quota](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountQuotas) for each one. See this [Microsoft website](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes) for some details on the different families. The easiest way to filter the options and choose a size is to go to the Azure portal > Batch > [Pools page](https://portal.azure.com/#@007gc.onmicrosoft.com/resource/subscriptions/8bc16bb2-5633-480b-8f4c-3ba6a6c769b4/resourceGroups/EcDc-WLS-rg/providers/Microsoft.Batch/batchAccounts/ecdcwlsbatch/accountPools) and click "Add" and then scroll to  vmSize and follow the link for "View full pricing details". In this example we use "Standard_DS2_v2". All the names start with "Standard_" and then you substitute the sku which contains the Family, # CPUs and version. 
 - targetDedicatedNodes: The number of nodes to have in the pool. Typically 1 if you are going to run one task that might use multiple cores on one machine for parallelization or one for each task you want to run on a separate machine. 
-- containerImageNames: The name of the docker image that you want to use. This will pre-fetch this docker image for use with your tasks. You can enter the name of any [DockerHub](https://hub.docker.com/) image. For R users see the [rocker project](https://rocker-project.org/images/versioned/rstudio.html) for some good options. The one used in the example file is "rocker/r-bspm:jammy" which has is based on ubuntu jammy and has R installed and set up to use the bspm package so that R packages can be installed on linux from binary using `install.packages` as usual. 
+- containerImageNames: The name of the docker image that you want to use. This will pre-fetch this docker image for use with your tasks. You can enter the name of any [DockerHub](https://hub.docker.com/) image. For R users see the [rocker project](https://rocker-project.org/images/versioned/rstudio.html) for some good options. The one used in the example file is "rocker/r-bspm:jammy" which is based on ubuntu jammy and has R installed and set up to use the bspm package so that R packages can be installed on linux from binary using `install.packages` as usual. 
 
 #### Optional customization fields:
 
-- imageReference: I have provided two pool template JSON files, one for windows and one for linux so you can just use one of those unless you have another reason to customize. (TODO: windows version did not work with example) This is basically the operating system that you want to use. You can choose from windows or linux options, but if you want to use docker you need to choose one that is docker compatible. To do this you can run `az batch pool supported-images list --filter "osType eq 'linux'"|tee test_linux.txt` this lists the supported images for the linux osType, change to 'windows' to see windows options, and outputs the result to a text file. I then searched the text file for "dockerCompatible" 
+- imageReference: I have provided two pool template JSON files, one for windows and one for linux so you can just use one of those unless you have another reason to customize. This is basically the operating system that you want to use. You can choose from windows or linux options, but if you want to use docker you need to choose one that is docker compatible. To do this you can run `az batch pool supported-images list --filter "osType eq 'linux'"|tee test_linux.txt` this lists the supported images for the linux osType, change to 'windows' to see windows options, and outputs the result to a text file. I then searched the text file for "dockerCompatible". Azure is no longer making dockerCompatible images so current image used in the template was created by CCOE and is provided in a Shared Image Gallery. It is just Ubuntu with Docker installed.   
 
 Once you are happy with the JSON file you can create your pool by running
 `az batch pool create --json-file cloud_config/template_pool_cli.json`
@@ -190,7 +193,7 @@ sastoken=`az storage container generate-sas --account-name ecdcwls --expiry $end
 sasurl=https://ecdcwls.blob.core.windows.net/sendicott/?$sastoken
 ```
 
-Then copy all files from a local directory to the container url created above then list the filenames in the container.
+Then copy all files from a local directory to the container url created above and list the filenames in the container.
 
 ```
 az storage copy -d $sasurl -s analyses --recursive
